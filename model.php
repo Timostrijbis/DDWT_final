@@ -415,7 +415,7 @@ function remove_series($pdo, $series_id)
  */
 function count_series($pdo)
 {
-    $stmt = $pdo->prepare('SELECT * FROM series');
+    $stmt = $pdo->prepare('SELECT * FROM users');
     $stmt->execute();
     $series = $stmt->rowCount();
     return $series;

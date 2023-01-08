@@ -21,39 +21,87 @@ $right_column = use_template('cards');
 $template = Array(
     1 => Array(
         'name' => 'Home',
-        'url' => '/DDWT22/week2/'
+        'url' => '/DDWT_final/'
     ),
     2 => Array(
         'name' => 'Overview',
-        'url' => '/DDWT22/week2/overview/'
+        'url' => '/DDWT_final/overview/'
     ),
     3 => Array(
         'name' => 'My Account',
-        'url' => '/DDWT22/week2/myaccount/'
+        'url' => '/DDWT_final/myaccount/'
     ),
     4 => Array(
-        'name' => '‘Register’',
-        'url' => '/DDWT22/week2/register/'
+        'name' => 'Register',
+        'url' => '/DDWT_final/register/'
     ),
     5 => Array(
-        'name' => '‘Add series’',
-        'url' => '/DDWT22/week2/add/'
+        'name' => 'Add series',
+        'url' => '/DDWT_final/add/'
     ));
 
 /* Landing page */
-if (new_route('/DDWT22/week2/', 'get')) {
+if (new_route('/DDWT_final/', 'get')) {
+
     /* Page info */
     $page_title = 'Home';
     $breadcrumbs = get_breadcrumbs([
-        'DDWT22' => na('/DDWT22/', False),
-        'Week 2' => na('/DDWT22/week2/', False),
-        'Home' => na('/DDWT22/week2/', True)
+        'Final' => na('/DDWT_final/', False),
+        'Home' => na('/DDWT_final/', True)
     ]);
     $navigation = get_navigation($template, 1);
 
     /* Page content */
-    $page_subtitle = 'The online platform to list your favorite series';
-    $page_content = 'On Series Overview you can list your favorite series. You can see the favorite series of all Series Overview users. By sharing your favorite series, you can get inspired by others and explore new series.';
+    $page_subtitle = 'Welkom bij onze website';
+    $page_content = 'Zoek hier naar een nieuwe kamer in groningen, of geef je kamer beschikbaar voor een nieuwe huurder.';
     /* Choose Template */
     include use_template('main');
+}
+
+elseif (new_route('/DDWT_final/register/', 'get')) {
+
+    /* Page info */
+    $page_title = 'Register';
+    $breadcrumbs = get_breadcrumbs([
+        'Final' => na('/DDWT_final/', False),
+        'Register' => na('/DDWT_final/register/', True)
+    ]);
+    $navigation = get_navigation($template, 4);
+
+    /* Page content */
+    $page_subtitle = 'Registreer account';
+    $page_content = 'Maak hier een nieuwe accoount aan.';
+    /* Choose Template */
+    include use_template('register');
+}
+
+/* Register POST */
+elseif (new_route('/DDWT_final/week2/register/', 'post')) {
+
+    /* Page info */
+    $page_title = 'Register';
+    $breadcrumbs = get_breadcrumbs([
+        'Final' => na('/DDWT_final/', False),
+        'Home' => na('/DDWT_final/', False),
+        'Register' => na('/DDWT_final/register/', True)
+    ]);
+    $navigation = get_navigation($template, 4);
+
+    /* Page content */
+    $page_subtitle = 'Register account';
+
+    /* Add series to database */
+    $feedback = register_user($db, $_POST);
+    $error_msg = get_error($_GET['error_msg']);
+    redirect(sprintf('/DDWT22/week2/myaccount/?error_msg=%s',
+        urlencode(json_encode($feedback))));
+
+
+    include use_template('register');
+
+}
+
+else {
+    http_response_code(404);
+    echo '404 Not Found';
 }
