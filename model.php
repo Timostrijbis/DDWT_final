@@ -136,10 +136,10 @@ function get_navigation($template, $active_id)
 
 /**
  * Creates a Bootstrap table with a list of series
- * @param array $series Associative array of series
+ * @param array $room Associative array of series
  * @return string
  */
-function get_series_table($series, $pdo)
+function get_room_table($room, $pdo)
 {
     $table_exp = '
     <table class="table table-hover">
@@ -151,7 +151,7 @@ function get_series_table($series, $pdo)
     </tr>
     </thead>
     <tbody>';
-    foreach ($series as $key => $value) {
+    foreach ($room as $key => $value) {
         $table_exp .= '
         <tr>
             <th scope="row">' . $value['address'] . '</th>
@@ -187,36 +187,36 @@ function get_series($pdo)
 {
     $stmt = $pdo->prepare('SELECT * FROM rooms');
     $stmt->execute();
-    $series = $stmt->fetchAll();
-    $series_exp = array();
+    $room = $stmt->fetchAll();
+    $room_exp = array();
 
     /* Create array with htmlspecialchars */
-    foreach ($series as $key => $value) {
+    foreach ($room as $key => $value) {
         foreach ($value as $user_key => $user_input) {
-            $series_exp[$key][$user_key] = htmlspecialchars($user_input);
+            $room_exp[$key][$user_key] = htmlspecialchars($user_input);
         }
     }
-    return $series_exp;
+    return $room_exp;
 }
 
 /**
  * Generates an array with series information
  * @param PDO $pdo Database object
- * @param int $series_id ID from the series
+ * @param int $room_id ID from the series
  * @return mixed
  */
-function get_series_info($pdo, $series_id)
+function get_room_info($pdo, $room_id)
 {
     $stmt = $pdo->prepare('SELECT * FROM series WHERE id = ?');
-    $stmt->execute([$series_id]);
-    $series_info = $stmt->fetch();
-    $series_info_exp = array();
+    $stmt->execute([$room_id]);
+    $room_info = $stmt->fetch();
+    $room_info_exp = array();
 
     /* Create array with htmlspecialchars */
-    foreach ($series_info as $key => $value) {
-        $series_info_exp[$key] = htmlspecialchars($value);
+    foreach ($room_info as $key => $value) {
+        $room_info_exp[$key] = htmlspecialchars($value);
     }
-    return $series_info_exp;
+    return $room_info_exp;
 }
 
 /**
@@ -241,17 +241,17 @@ function get_error($feedback)
 /**
  * Add series to the database
  * @param PDO $pdo Database object
- * @param array $series_info Associative array with series info
+ * @param array $room_info Associative array with series info
  * @return array Associative array with key type and message
  */
-function add_series($pdo, $series_info)
+function add_series($pdo, $room_info)
 {
     /* Check if all fields are set */
     if (
-        empty($series_info['Name']) or
-        empty($series_info['Creator']) or
-        empty($series_info['Seasons']) or
-        empty($series_info['Abstract'])
+        empty($room_info['Name']) or
+        empty($room_info['Creator']) or
+        empty($room_info['Seasons']) or
+        empty($room_info['Abstract'])
     ) {
         return [
             'type' => 'danger',
@@ -260,7 +260,7 @@ function add_series($pdo, $series_info)
     }
 
     /* Check data type */
-    if (!is_numeric($series_info['Seasons'])) {
+    if (!is_numeric($room_info['Seasons'])) {
         return [
             'type' => 'danger',
             'message' => 'There was an error. You should enter a number in the field Seasons.'
@@ -269,9 +269,9 @@ function add_series($pdo, $series_info)
 
     /* Check if series already exists */
     $stmt = $pdo->prepare('SELECT * FROM series WHERE name = ?');
-    $stmt->execute([$series_info['Name']]);
-    $series = $stmt->rowCount();
-    if ($series) {
+    $stmt->execute([$room_info['Name']]);
+    $room = $stmt->rowCount();
+    if ($room) {
         return [
             'type' => 'danger',
             'message' => 'This series was already added.'
@@ -282,10 +282,10 @@ function add_series($pdo, $series_info)
     session_start();
     $stmt = $pdo->prepare("INSERT INTO series (name, creator, seasons, abstract, user) VALUES (?, ?, ?, ?, ?)");
     $stmt->execute([
-        $series_info['Name'],
-        $series_info['Creator'],
-        $series_info['Seasons'],
-        $series_info['Abstract'],
+        $room_info['Name'],
+        $room_info['Creator'],
+        $room_info['Seasons'],
+        $room_info['Abstract'],
         $_SESSION['user_id']
 
     ]);
@@ -293,7 +293,7 @@ function add_series($pdo, $series_info)
     if ($inserted == 1) {
         return [
             'type' => 'success',
-            'message' => sprintf("Series '%s' added to Series Overview.", $series_info['Name'])
+            'message' => sprintf("Series '%s' added to Series Overview.", $room_info['Name'])
         ];
     } else {
         return [
@@ -306,18 +306,18 @@ function add_series($pdo, $series_info)
 /**
  * Updates a series in the database
  * @param PDO $pdo Database object
- * @param array $series_info Associative array with series info
+ * @param array $room_info Associative array with series info
  * @return array
  */
-function update_series($pdo, $series_info)
+function update_series($pdo, $room_info)
 {
     /* Check if all fields are set */
     if (
-        empty($series_info['Name']) or
-        empty($series_info['Creator']) or
-        empty($series_info['Seasons']) or
-        empty($series_info['Abstract']) or
-        empty($series_info['series_id'])
+        empty($room_info['Name']) or
+        empty($room_info['Creator']) or
+        empty($room_info['Seasons']) or
+        empty($room_info['Abstract']) or
+        empty($room_info['series_id'])
     ) {
         return [
             'type' => 'danger',
@@ -326,7 +326,7 @@ function update_series($pdo, $series_info)
     }
 
     /* Check data type */
-    if (!is_numeric($series_info['Seasons'])) {
+    if (!is_numeric($room_info['Seasons'])) {
         return [
             'type' => 'danger',
             'message' => 'There was an error. You should enter a number in the field Seasons.'
@@ -335,36 +335,36 @@ function update_series($pdo, $series_info)
 
     /* Get current series name */
     $stmt = $pdo->prepare('SELECT * FROM series WHERE id = ?');
-    $stmt->execute([$series_info['series_id']]);
-    $series = $stmt->fetch();
-    $current_name = $series['name'];
+    $stmt->execute([$room_info['series_id']]);
+    $room = $stmt->fetch();
+    $current_name = $room['name'];
 
     /* Check if series already exists */
     $stmt = $pdo->prepare('SELECT * FROM series WHERE name = ?');
-    $stmt->execute([$series_info['Name']]);
-    $series = $stmt->fetch();
-    if ($series_info['Name'] == $series['name'] and $series['name'] != $current_name) {
+    $stmt->execute([$room_info['Name']]);
+    $room = $stmt->fetch();
+    if ($room_info['Name'] == $room['name'] and $room['name'] != $current_name) {
         return [
             'type' => 'danger',
-            'message' => sprintf("The name of the series cannot be changed. %s already exists.", $series_info['Name'])
+            'message' => sprintf("The name of the series cannot be changed. %s already exists.", $room_info['Name'])
         ];
     }
 
     /* Update Series */
     $stmt = $pdo->prepare("UPDATE series SET name = ?, creator = ?, seasons = ?, abstract = ? WHERE id = ?");
     $stmt->execute([
-        $series_info['Name'],
-        $series_info['Creator'],
-        $series_info['Seasons'],
-        $series_info['Abstract'],
-        $series_info['series_id']
+        $room_info['Name'],
+        $room_info['Creator'],
+        $room_info['Seasons'],
+        $room_info['Abstract'],
+        $room_info['series_id']
     ]);
     $updated = $stmt->rowCount();
-    if ($_SESSION['user_id'] == $series_info['user']) {
+    if ($_SESSION['user_id'] == $room_info['user']) {
         if ($updated == 1) {
             return [
                 'type' => 'success',
-                'message' => sprintf("Series '%s' was edited!", $series_info['Name'])
+                'message' => sprintf("Series '%s' was edited!", $room_info['Name'])
             ];
         } else {
             return [
@@ -379,24 +379,24 @@ function update_series($pdo, $series_info)
 /**
  * Removes a series with a specific series ID
  * @param PDO $pdo Database object
- * @param int $series_id ID of the series
+ * @param int $room_id ID of the series
  * @return array
  */
-function remove_series($pdo, $series_id)
+function remove_series($pdo, $room_id)
 {
     /* Get series info */
     session_start();
-    $series_info = get_series_info($pdo, $series_id);
+    $room_info = get_room_info($pdo, $room_id);
 
     /* Delete Series */
-    $stmt = $pdo->prepare("DELETE FROM series WHERE id = ?");
-    $stmt->execute([$series_id]);
+    $stmt = $pdo->prepare("DELETE FROM rooms WHERE id = ?");
+    $stmt->execute([$room_id]);
     $deleted = $stmt->rowCount();
-    if ($_SESSION['user_id'] == $series_info['user']) {
+    if ($_SESSION['user_id'] == $room_info['user']) {
         if ($deleted == 1) {
             return [
                 'type' => 'success',
-                'message' => sprintf("Series '%s' was removed!", $series_info['name'])
+                'message' => sprintf("Series '%s' was removed!", $room_info['name'])
             ];
         } else {
             return [
@@ -417,8 +417,8 @@ function count_series($pdo)
 {
     $stmt = $pdo->prepare('SELECT * FROM users');
     $stmt->execute();
-    $series = $stmt->rowCount();
-    return $series;
+    $room = $stmt->rowCount();
+    return $room;
 }
 
 function count_users($pdo)
@@ -480,8 +480,8 @@ function register_user($pdo, $form_data)
     /* Check if series already exists */
     $stmt = $pdo->prepare('SELECT * FROM users WHERE username = ?');
     $stmt->execute([$form_data['username']]);
-    $series = $stmt->rowCount();
-    if ($series) {
+    $room = $stmt->rowCount();
+    if ($room) {
         return [
             'type' => 'danger',
             'message' => 'This Username is already taken.'

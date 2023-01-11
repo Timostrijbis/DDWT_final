@@ -86,14 +86,14 @@ elseif (new_route('/DDWT_final/overview/', 'get')) {
     $page_title = 'Overview';
     $breadcrumbs = get_breadcrumbs([
         'Home' => na('/DDWT_final/', False),
-        'Overview' => na('/DDWT22/overview', True)
+        'Overview' => na('/DDWT_final/overview', True)
     ]);
     $navigation = get_navigation($template, 2);
 
     /* Page content */
     $page_subtitle = 'The overview of all series';
     $page_content = 'Here you find all series listed on Series Overview.';
-    $left_content = get_series_table(get_series($db), $db);
+    $left_content = get_room_table(get_series($db), $db);
     if (isset($_GET['error_msg'])) {
         $error_msg = get_error($_GET['error_msg']);
     }
