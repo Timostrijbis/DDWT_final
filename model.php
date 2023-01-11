@@ -154,9 +154,9 @@ function get_series_table($series, $pdo)
     foreach ($series as $key => $value) {
         $table_exp .= '
         <tr>
-            <th scope="row">' . $value['name'] . '</th>
-            <th scope="row">' . get_user_name($value['user'], $pdo) . '</th>
-            <td><a href="/DDWT22/week2/series/?series_id=' . $value['id'] . '" role="button" class="btn btn-primary">More info</a></td>
+            <th scope="row">' . $value['address'] . '</th>
+            <th scope="row">' . get_user_name($value['price'], $pdo) . '</th>
+            <td><a href="/DDWT_final/rooms/?series_id=' . $value['id'] . '" role="button" class="btn btn-primary">More info</a></td>
         </tr>
         ';
     }
@@ -185,7 +185,7 @@ function p_print($input)
  */
 function get_series($pdo)
 {
-    $stmt = $pdo->prepare('SELECT * FROM series');
+    $stmt = $pdo->prepare('SELECT * FROM rooms');
     $stmt->execute();
     $series = $stmt->fetchAll();
     $series_exp = array();
@@ -454,11 +454,10 @@ function get_user_id()
 
 function get_user_name($user_id, $pdo)
 {
-    $stmt = $pdo->prepare('SELECT firstname, lastname FROM users WHERE id = ?');
+    $stmt = $pdo->prepare('SELECT name FROM users WHERE username = ?');
     $stmt->execute([$user_id]);
     $full_name_info = $stmt->fetch();
-    $full_name = $full_name_info["firstname"] . " " . $full_name_info["lastname"];
-    return $full_name;
+    return $full_name_info;
 }
 
 /* register a new user */
