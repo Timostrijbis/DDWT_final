@@ -18,27 +18,44 @@ $nbr_users = count_users($db);
 
 $right_column = use_template('cards');
 
-$template = Array(
-    1 => Array(
-        'name' => 'Home',
-        'url' => '/DDWT_final/'
-    ),
-    2 => Array(
-        'name' => 'Overview',
-        'url' => '/DDWT_final/overview/'
-    ),
-    3 => Array(
-        'name' => 'My Account',
-        'url' => '/DDWT_final/myaccount/'
-    ),
-    4 => Array(
-        'name' => 'Register',
-        'url' => '/DDWT_final/register/'
-    ),
-    5 => Array(
-        'name' => 'Add series',
-        'url' => '/DDWT_final/add/'
-    ));
+if (check_login() == True) {
+    $template = Array(
+        1 => Array(
+            'name' => 'Home',
+            'url' => '/DDWT_final/'
+        ),
+        2 => Array(
+            'name' => 'Overview',
+            'url' => '/DDWT_final/overview/'
+        ),
+        3 => Array(
+            'name' => 'My Account',
+            'url' => '/DDWT_final/myaccount/'
+        ),
+        4 => Array(
+            'name' => 'Add series',
+            'url' => '/DDWT_final/add/'
+        ));
+}
+else {
+    $template = Array(
+        1 => Array(
+            'name' => 'Home',
+            'url' => '/DDWT_final/'
+        ),
+        2 => Array(
+            'name' => 'Overview',
+            'url' => '/DDWT_final/overview/'
+        ),
+        5 => Array(
+            'name' => 'Register',
+            'url' => '/DDWT_final/register/'
+        ),
+        6 => Array(
+            'name' => 'Login',
+            'url' => '/DDWT_final/login/'
+        ));
+}
 
 /* Landing page */
 if (new_route('/DDWT_final/', 'get')) {
@@ -66,7 +83,7 @@ elseif (new_route('/DDWT_final/register/', 'get')) {
         'Final' => na('/DDWT_final/', False),
         'Register' => na('/DDWT_final/register/', True)
     ]);
-    $navigation = get_navigation($template, 4);
+    $navigation = get_navigation($template, 5);
 
     /* Page content */
     $page_subtitle = 'Registreer account';
@@ -85,7 +102,7 @@ elseif (new_route('/DDWT_final/week2/register/', 'post')) {
         'Home' => na('/DDWT_final/', False),
         'Register' => na('/DDWT_final/register/', True)
     ]);
-    $navigation = get_navigation($template, 4);
+    $navigation = get_navigation($template, 5);
 
     /* Page content */
     $page_subtitle = 'Register account';
