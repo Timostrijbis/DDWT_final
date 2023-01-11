@@ -58,6 +58,28 @@ if (new_route('/DDWT_final/', 'get')) {
     include use_template('main');
 }
 
+/* Overview page */
+elseif (new_route('/DDWT_final/overview/', 'get')) {
+
+    /* Page info */
+    $page_title = 'Overview';
+    $breadcrumbs = get_breadcrumbs([
+        'Home' => na('/DDWT_final/', False),
+        'Overview' => na('/DDWT22/week2/overview', True)
+    ]);
+    $navigation = get_navigation($template, 2);
+
+    /* Page content */
+    $page_subtitle = 'The overview of all series';
+    $page_content = 'Here you find all series listed on Series Overview.';
+    $left_content = get_series_table(get_series($db), $db);
+    $error_msg = get_error($_GET['error_msg']);
+
+    /* Choose Template */
+    include use_template('main');
+}
+
+
 elseif (new_route('/DDWT_final/register/', 'get')) {
 
     /* Page info */
