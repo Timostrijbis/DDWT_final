@@ -93,7 +93,7 @@ elseif (new_route('/DDWT_final/week2/register/', 'post')) {
     /* Add series to database */
     $feedback = register_user($db, $_POST);
     $error_msg = get_error($_GET['error_msg']);
-    redirect(sprintf('/DDWT22/week2/myaccount/?error_msg=%s',
+    redirect(sprintf('/DDWT_final/myaccount/?error_msg=%s',
         urlencode(json_encode($feedback))));
 
 
