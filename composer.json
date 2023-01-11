@@ -1,0 +1,14 @@
+{
+  "name": "DDWT_final",
+  "description": "description",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Timos",
+      "email": "email@example.com"
+    }
+  ],
+  "require": {
+  }
+}
