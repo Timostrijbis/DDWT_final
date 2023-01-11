@@ -96,9 +96,26 @@ elseif (new_route('/DDWT_final/week2/register/', 'post')) {
     redirect(sprintf('/DDWT_final/myaccount/?error_msg=%s',
         urlencode(json_encode($feedback))));
 
-
     include use_template('register');
 
+}
+
+elseif (new_route('/DDWT_final/myaccount/', 'get')) {
+
+    /* Page info */
+    $page_title = 'My Account';
+    $breadcrumbs = get_breadcrumbs([
+        'Final' => na('/DDWT_final/', False),
+        'Home' => na('/DDWT_final/', False),
+        'Register' => na('/DDWT_final/myaccount/', True)
+    ]);
+    $navigation = get_navigation($template, 3);
+
+    /* Page content */
+    $page_subtitle = 'My account';
+
+    /* Include template */
+    include use_template('account');
 }
 
 else {
