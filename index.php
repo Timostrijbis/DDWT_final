@@ -18,7 +18,7 @@ $nbr_users = count_users($db);
 
 $right_column = use_template('cards');
 
-if (check_login() == True) {
+if (check_login()) {
     $template = Array(
         1 => Array(
             'name' => 'Home',
@@ -35,6 +35,10 @@ if (check_login() == True) {
         4 => Array(
             'name' => 'Add series',
             'url' => '/DDWT_final/add/'
+        ),
+        7 => Array(
+            'name' => 'Messages',
+            'url' => 'DDWT_final/messages/'
         ));
 }
 else {
@@ -82,7 +86,7 @@ elseif (new_route('/DDWT_final/overview/', 'get')) {
     $page_title = 'Overview';
     $breadcrumbs = get_breadcrumbs([
         'Home' => na('/DDWT_final/', False),
-        'Overview' => na('/DDWT22/week2/overview', True)
+        'Overview' => na('/DDWT22/overview', True)
     ]);
     $navigation = get_navigation($template, 2);
 
@@ -90,7 +94,9 @@ elseif (new_route('/DDWT_final/overview/', 'get')) {
     $page_subtitle = 'The overview of all series';
     $page_content = 'Here you find all series listed on Series Overview.';
     $left_content = get_series_table(get_series($db), $db);
-    $error_msg = get_error($_GET['error_msg']);
+    if (isset($_GET['error_msg'])) {
+        $error_msg = get_error($_GET['error_msg']);
+    }
 
     /* Choose Template */
     include use_template('main');
@@ -115,7 +121,7 @@ elseif (new_route('/DDWT_final/register/', 'get')) {
 }
 
 /* Register POST */
-elseif (new_route('/DDWT_final/week2/register/', 'post')) {
+elseif (new_route('/DDWT_final/register/', 'post')) {
 
     /* Page info */
     $page_title = 'Register';
@@ -131,7 +137,9 @@ elseif (new_route('/DDWT_final/week2/register/', 'post')) {
 
     /* Add series to database */
     $feedback = register_user($db, $_POST);
-    $error_msg = get_error($_GET['error_msg']);
+    if (isset($_GET['error_msg'])) {
+        $error_msg = get_error($_GET['error_msg']);
+    }
     redirect(sprintf('/DDWT_final/myaccount/?error_msg=%s',
         urlencode(json_encode($feedback))));
 
@@ -156,6 +164,30 @@ elseif (new_route('/DDWT_final/myaccount/', 'get')) {
     /* Include template */
     include use_template('account');
 }
+
+elseif (new_route('/DDWT_final/login/', 'get')) {
+
+    /* Page info */
+    $page_title = 'My Account';
+    $breadcrumbs = get_breadcrumbs([
+        'Final' => na('/DDWT_final/', False),
+        'Home' => na('/DDWT_final/', False),
+        'Login' => na('/DDWT_final/login/', True)
+    ]);
+    $navigation = get_navigation($template, 6);
+
+    /* Page content */
+    $page_subtitle = 'Log into your account';
+
+    /* Include template */
+    include use_template('login');
+}
+
+elseif (new_route('/DDWT_final/myaccount/', 'post')) {
+
+
+}
+
 
 else {
     http_response_code(404);

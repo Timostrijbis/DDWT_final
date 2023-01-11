@@ -504,7 +504,7 @@ function register_user($pdo, $form_data)
             'type' => 'success',
             'message' => sprintf("User '%s' added to user Overview.", $form_data['username'])
         ];
-        redirect('/DDWT22/week2/myaccount/');
+        redirect('/DDWT_final/myaccount/');
     } else {
         return [
             'type' => 'danger',
