@@ -1,5 +1,5 @@
 {
-  "name": "DDWT_final",
+  "name": "timostrijbis/ddwt_final",
   "description": "description",
   "minimum-stability": "stable",
   "license": "proprietary",
@@ -10,5 +10,6 @@
     }
   ],
   "require": {
+    "bramus/router": "1.5"
   }
 }

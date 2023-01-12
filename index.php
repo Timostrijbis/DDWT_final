@@ -11,6 +11,9 @@ include 'model.php';
 /* Connect to DB */
 $db = connect_db('localhost', 'DDWT_final', 'ddwt22','ddwt22');
 
+/* Require composer autoloader */
+require __DIR__ . '/vendor/autoload.php';
+
 /* Section for redundant code */
 /* Get Number of Series */
 $nbr_series = count_series($db);
@@ -61,27 +64,31 @@ else {
         ));
 }
 
-/* Landing page */
-if (new_route('/DDWT_final/', 'get')) {
+/* Create Router instance */
+$router = new \Bramus\Router\Router();
 
-    /* Page info */
-    $page_title = 'Home';
-    $breadcrumbs = get_breadcrumbs([
-        'Final' => na('/DDWT_final/', False),
-        'Home' => na('/DDWT_final/', True)
-    ]);
-    $navigation = get_navigation($template, 1);
+$router->get('/', function () use ($template, $db, $nbr_series, $nbr_users) {
+    if (new_route('/DDWT_final/', 'get')) {
 
-    /* Page content */
-    $page_subtitle = 'Welkom bij onze website';
-    $page_content = 'Zoek hier naar een nieuwe kamer in groningen, of geef je kamer beschikbaar voor een nieuwe huurder.';
-    /* Choose Template */
-    include use_template('main');
-}
+        /* Page info */
+        $page_title = 'Home';
+        $breadcrumbs = get_breadcrumbs([
+            'Final' => na('/DDWT_final/', False),
+            'Home' => na('/DDWT_final/', True)
+        ]);
+        $navigation = get_navigation($template, 1);
+
+        /* Page content */
+        $page_subtitle = 'Welkom bij onze website';
+        $page_content = 'Zoek hier naar een nieuwe kamer in groningen, of geef je kamer beschikbaar voor een nieuwe huurder.';
+        $right_column = use_template('cards');
+        /* Choose Template */
+        include use_template('main');
+    }
+});
 
 /* Overview page */
-elseif (new_route('/DDWT_final/overview/', 'get')) {
-
+$router->get('overview/', function () use ($template, $db, $nbr_series, $nbr_users) {
     /* Page info */
     $page_title = 'Overview';
     $breadcrumbs = get_breadcrumbs([
@@ -97,14 +104,14 @@ elseif (new_route('/DDWT_final/overview/', 'get')) {
     if (isset($_GET['error_msg'])) {
         $error_msg = get_error($_GET['error_msg']);
     }
+    $right_column = use_template('cards');
 
     /* Choose Template */
     include use_template('main');
-}
+});
 
 
-elseif (new_route('/DDWT_final/register/', 'get')) {
-
+$router->get('register/', function () use ($template, $db) {
     /* Page info */
     $page_title = 'Register';
     $breadcrumbs = get_breadcrumbs([
@@ -118,11 +125,10 @@ elseif (new_route('/DDWT_final/register/', 'get')) {
     $page_content = 'Maak hier een nieuwe accoount aan.';
     /* Choose Template */
     include use_template('register');
-}
+});
 
 /* Register POST */
-elseif (new_route('/DDWT_final/register/', 'post')) {
-
+$router->post('register/', function () use ($template, $db) {
     /* Page info */
     $page_title = 'Register';
     $breadcrumbs = get_breadcrumbs([
@@ -144,11 +150,9 @@ elseif (new_route('/DDWT_final/register/', 'post')) {
         urlencode(json_encode($feedback))));
 
     include use_template('register');
+});
 
-}
-
-elseif (new_route('/DDWT_final/myaccount/', 'get')) {
-
+$router->get('myaccount/', function () use ($template, $db) {
     /* Page info */
     $page_title = 'My Account';
     $breadcrumbs = get_breadcrumbs([
@@ -163,10 +167,9 @@ elseif (new_route('/DDWT_final/myaccount/', 'get')) {
 
     /* Include template */
     include use_template('account');
-}
+});
 
-elseif (new_route('/DDWT_final/login/', 'get')) {
-
+$router->get('myaccount/', function () use ($template, $db) {
     /* Page info */
     $page_title = 'My Account';
     $breadcrumbs = get_breadcrumbs([
@@ -181,15 +184,31 @@ elseif (new_route('/DDWT_final/login/', 'get')) {
 
     /* Include template */
     include use_template('login');
-}
+});
 
-elseif (new_route('/DDWT_final/myaccount/', 'post')) {
+$router->post('myaccount/', function () use ($template, $db) {
+    /* Page info */
+    $page_title = 'My Account';
+    $breadcrumbs = get_breadcrumbs([
+        'Final' => na('/DDWT_final/', False),
+        'Home' => na('/DDWT_final/', False),
+        'Login' => na('/DDWT_final/login/', True)
+    ]);
+    $navigation = get_navigation($template, 6);
 
+    /* Page content */
+    $page_subtitle = 'Log into your account';
 
-}
+    /* Include template */
+    include use_template('login');
+});
 
+// Set404 for when user puts in wrong path
+$router->set404(function() {
+    header('HTTP/1.1 404 Not Found');
+    echo "404 page not found";
+});
 
-else {
-    http_response_code(404);
-    echo '404 Not Found';
-}
+/* Run the router */
+$router->run();
+
