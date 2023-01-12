@@ -45,12 +45,8 @@
                     <input type="password" class="form-control" id="inputPassword" placeholder="******" name="password" required>
                 </div>
                 <div class="form-group">
-                    <label for="inputUsername">First name</label>
+                    <label for="inputUsername">First</label>
                     <input type="text" class="form-control" id="inputUsername" placeholder="Jan" name="firstname" required>
-                </div>
-                <div class="form-group">
-                    <label for="inputUsername">Last name</label>
-                    <input type="text" class="form-control" id="inputUsername" placeholder="Jansen" name="lastname" required>
                 </div>
                 <button type="submit" class="btn btn-primary">Register now</button>
             </form>

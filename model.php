@@ -561,7 +561,6 @@ function login_user($pdo, $form_data)
 
 function check_login()
 {
-    session_start();
     if (isset($_SESSION['user_id'])) {
         return True;
     } else {
@@ -579,4 +578,10 @@ function logout_user()
     ];
 }
 
+function set_cred($username, $password){
+    return [
+        'username'=> $username,
+        'password'=> $password
+    ];
+}
 

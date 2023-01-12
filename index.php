@@ -11,6 +11,9 @@ include 'model.php';
 /* Connect to DB */
 $db = connect_db('localhost', 'DDWT_final', 'ddwt22','ddwt22');
 
+// Set credentials for authentication
+$cred = set_cred('DDWT_final', 'DDWT_final');
+
 /* Require composer autoloader */
 require __DIR__ . '/vendor/autoload.php';
 
@@ -18,8 +21,6 @@ require __DIR__ . '/vendor/autoload.php';
 /* Get Number of Series */
 $nbr_series = count_series($db);
 $nbr_users = count_users($db);
-
-$right_column = use_template('cards');
 
 if (check_login()) {
     $template = Array(
@@ -67,6 +68,8 @@ else {
 /* Create Router instance */
 $router = new \Bramus\Router\Router();
 
+
+/* landing page */
 $router->get('/', function () use ($template, $db, $nbr_series, $nbr_users) {
     if (new_route('/DDWT_final/', 'get')) {
 
@@ -110,7 +113,37 @@ $router->get('overview/', function () use ($template, $db, $nbr_series, $nbr_use
     include use_template('main');
 });
 
+//$router->get('overview/', function () use ($template, $db, $nbr_series, $nbr_users) {
+//
+//});
 
+
+/* add room page */
+$router->get('add/', function () use ($template, $db, $nbr_series, $nbr_users) {
+    $login_status = check_login();
+    if (!$login_status) {
+        redirect("/DDWT_final/login/");
+    }
+    /* Page info */
+    $page_title = 'Add Series';
+    $breadcrumbs = get_breadcrumbs([
+        'DDWT_final' => na('/DDWT_final/', False),
+        '' => na('/DDWT_final/', False),
+        'Add Series' => na('/DDWT_final/new/', True)
+    ]);
+    $navigation = get_navigation($template, 5);
+
+    /* Page content */
+    $page_subtitle = 'Add your favorite series';
+    $page_content = 'Fill in the details of you favorite series.';
+    $submit_btn = "Add Series";
+    $form_action = '/DDWT_final/add/';
+    if (isset($_GET['error_msg'])) {
+        $error_msg = get_error($_GET['error_msg']);
+    }
+});
+
+/* register get */
 $router->get('register/', function () use ($template, $db) {
     /* Page info */
     $page_title = 'Register';
@@ -152,6 +185,7 @@ $router->post('register/', function () use ($template, $db) {
     include use_template('register');
 });
 
+/* my account get */
 $router->get('myaccount/', function () use ($template, $db) {
     /* Page info */
     $page_title = 'My Account';
@@ -169,6 +203,7 @@ $router->get('myaccount/', function () use ($template, $db) {
     include use_template('account');
 });
 
+/* ???? */
 $router->get('myaccount/', function () use ($template, $db) {
     /* Page info */
     $page_title = 'My Account';
@@ -186,6 +221,7 @@ $router->get('myaccount/', function () use ($template, $db) {
     include use_template('login');
 });
 
+/* my account post */
 $router->post('myaccount/', function () use ($template, $db) {
     /* Page info */
     $page_title = 'My Account';
@@ -200,6 +236,54 @@ $router->post('myaccount/', function () use ($template, $db) {
     $page_subtitle = 'Log into your account';
 
     /* Include template */
+    include use_template('login');
+});
+
+/* login get */
+$router->get('login/', function () use ($template, $db) {
+    /* Page info */
+    $page_title = 'Login';
+    $breadcrumbs = get_breadcrumbs([
+        'DDWT_final' => na('/DDWT_final/', False),
+        'Login' => na('/DDWT_final/login', True)
+    ]);
+    $navigation = get_navigation($template, False);
+
+    /* Page content */
+    if (isset($_GET['error_msg'])) {
+        $error_msg = get_error($_GET['error_msg']);
+    }
+    $page_subtitle = 'Login';
+    $page_content = 'Login to your account here';
+
+    /* Choose Template */
+    include use_template('login');
+});
+
+/* login post */
+$router->post('login/', function () use ($template, $db) {
+    /* Page info */
+    $page_title = 'Login';
+    $breadcrumbs = get_breadcrumbs([
+        'DDWT_final' => na('/DDWT_final/', False),
+        'Login' => na('/DDWT_final/login/', True)
+    ]);
+    $navigation = get_navigation($template, False);
+
+    /* Page content */
+    $page_subtitle = 'Login to account';
+
+    $feedback = login_user($db, $_POST);
+    $error_msg = get_error($_GET['error_msg']);
+    if (check_login()) {
+        redirect(sprintf('/DDWT_final/myaccount/?error_msg=%s',
+            urlencode(json_encode($feedback))));
+    } else {
+        redirect(sprintf('/DDWT_final/login/?error_msg=%s',
+            urlencode(json_encode($feedback))));
+        $error_msg = get_error($_GET['error_msg']);
+    }
+
     include use_template('login');
 });
 
