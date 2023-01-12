@@ -156,7 +156,7 @@ function get_room_table($room, $pdo)
         <tr>
             <th scope="row">' . $value['address'] . '</th>
             <th scope="row">' . get_user_name($value['price'], $pdo) . '</th>
-            <td><a href="/DDWT_final/rooms/?series_id=' . $value['id'] . '" role="button" class="btn btn-primary">More info</a></td>
+            <td><a href="/DDWT_final/rooms/' . $value['id'] . '" role="button" class="btn btn-primary">More info</a></td>
         </tr>
         ';
     }
@@ -207,7 +207,7 @@ function get_series($pdo)
  */
 function get_room_info($pdo, $room_id)
 {
-    $stmt = $pdo->prepare('SELECT * FROM series WHERE id = ?');
+    $stmt = $pdo->prepare('SELECT * FROM rooms WHERE id = ?');
     $stmt->execute([$room_id]);
     $room_info = $stmt->fetch();
     $room_info_exp = array();

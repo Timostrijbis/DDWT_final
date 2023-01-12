@@ -113,9 +113,33 @@ $router->get('overview/', function () use ($template, $db, $nbr_series, $nbr_use
     include use_template('main');
 });
 
-//$router->get('overview/', function () use ($template, $db, $nbr_series, $nbr_users) {
-//
-//});
+$router->get('rooms/(\d+)', function ($room_id) use ($template, $db, $nbr_series, $nbr_users) {
+    /* Get series from db */
+    $room_info = get_room_info($db, $room_id);
+
+    /* Page info */
+    $page_title = 'Overview';
+    $breadcrumbs = get_breadcrumbs([
+        'Home' => na('/DDWT_final/', False),
+        'Overview' => na('/DDWT_final/overview', True)
+    ]);
+    $navigation = get_navigation($template, 3);
+
+    /* Page content */
+    $added_by = $room_info['owner'];
+    $page_subtitle = sprintf("Information about %s", $room_info['address']);
+    $page_content = $room_info['price'];
+    $nbr_seasons = $room_info['type'];
+    $creators = $room_info['size'];
+    session_start();
+    $display_buttons = False;
+    if ($_SESSION['user_id'] == $room_info['owner']) {
+        $display_buttons = True;
+    }
+    $right_column = use_template('cards');
+    /* Choose Template */
+    include use_template('series');
+});
 
 
 /* add room page */
