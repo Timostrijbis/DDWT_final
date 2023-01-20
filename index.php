@@ -137,7 +137,7 @@ $router->get('rooms/edit/(\d+)', function ($room_id) use ($template, $db, $nbr_s
     include use_template('edit');
 });
 
-$router->get('rooms/(\d+)', function ($room_id) use ($template, $db, $nbr_series, $nbr_users) {
+$router->get('room/(\d+)', function ($room_id) use ($template, $db, $nbr_series, $nbr_users) {
     /* Get series from db */
     $room_info = get_room_info($db, $room_id);
 
@@ -263,6 +263,9 @@ $router->get('myaccount/', function () use ($template, $db) {
         'Register' => na('/DDWT_final/myaccount/', True)
     ]);
     $navigation = get_navigation($template, 3);
+    if (isset($_GET['error_msg'])) {
+        $error_msg = get_error($_GET['error_msg']);
+    }
 
     /* Page content */
     $page_subtitle = 'My account';
@@ -302,6 +305,7 @@ $router->post('myaccount/', function () use ($template, $db) {
 
     /* Page content */
     $page_subtitle = 'Log into your account';
+    $user = get_user_name();
 
     /* Include template */
     include use_template('login');

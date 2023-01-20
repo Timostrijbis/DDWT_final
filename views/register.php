@@ -45,8 +45,39 @@
                     <input type="password" class="form-control" id="inputPassword" placeholder="******" name="password" required>
                 </div>
                 <div class="form-group">
-                    <label for="inputUsername">First</label>
-                    <input type="text" class="form-control" id="inputUsername" placeholder="Jan" name="firstname" required>
+                    <label for="inputUsername">First name</label>
+                    <input type="text" class="form-control" id="inputUsername" placeholder="Jan" name="first_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="inputUsername">Last Name</label>
+                    <input type="text" class="form-control" id="inputLastname" placeholder="jansen" name="last_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="inputUsername">Occupation</label>
+                    <input type="text" class="form-control" id="inputOccupation" placeholder="Banker" name="occupation" required>
+                </div>
+                <div class="form-group">
+                    <label for="inputUsername">Date of birth</label>
+                    <input type="date" class="form-control" id="inputUsername" placeholder="1-1-2001" name="birth_date" required>
+                </div>
+                <div class="form-group">
+                    <label for="inputUsername">Phone number</label>
+                    <input type="text" class="form-control" id="inputPhone" placeholder="06-18989735" name="phone_number" required>
+                </div>
+                <div class="form-group">
+                    <label for="inputUsername">E-mail address</label>
+                    <input type="text" class="form-control" id="inputEmail" placeholder="j.jansen@home.nl" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="inputUsername">Role</label>
+                    <select id="inputRole", class="form-control" name="role" required>
+                        <option value="owner">Owner</option>
+                        <option value="tenant">Tenant</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="inputUsername">Biography</label>
+                    <input type="text" class="form-control" id="inputBio" name="biography" required>
                 </div>
                 <button type="submit" class="btn btn-primary">Register now</button>
             </form>

@@ -145,8 +145,9 @@ function get_room_table($room, $pdo)
     <table class="table table-hover">
     <thead
     <tr>
-        <th scope="col">Series</th>
-        <th scope="col">User Name</th>
+        <th scope="col">Address</th>
+        <th scope="col">Price</th>
+        <th scope="col">size</th>
         <th scope="col"></th>
     </tr>
     </thead>
@@ -155,8 +156,9 @@ function get_room_table($room, $pdo)
         $table_exp .= '
         <tr>
             <th scope="row">' . $value['address'] . '</th>
-            <th scope="row">' . get_user_name($value['price'], $pdo) . '</th>
-            <td><a href="/DDWT_final/rooms/' . $value['id'] . '" role="button" class="btn btn-primary">More info</a></td>
+            <th scope="row">' . $value['price'] . '</th>
+            <th scope="row">' . $value['size'] . '</th>
+            <td><a href="/DDWT_final/room/' . $value['id'] . '" role="button" class="btn btn-primary">More info</a></td>
         </tr>
         ';
     }
@@ -185,7 +187,7 @@ function p_print($input)
  */
 function get_series($pdo)
 {
-    $stmt = $pdo->prepare('SELECT * FROM rooms');
+    $stmt = $pdo->prepare('SELECT * FROM room');
     $stmt->execute();
     $room = $stmt->fetchAll();
     $room_exp = array();
@@ -207,7 +209,7 @@ function get_series($pdo)
  */
 function get_room_info($pdo, $room_id)
 {
-    $stmt = $pdo->prepare('SELECT * FROM rooms WHERE id = ?');
+    $stmt = $pdo->prepare('SELECT * FROM room WHERE id = ?');
     $stmt->execute([$room_id]);
     $room_info = $stmt->fetch();
     $room_info_exp = array();
@@ -389,7 +391,7 @@ function remove_series($pdo, $room_id)
     $room_info = get_room_info($pdo, $room_id);
 
     /* Delete Series */
-    $stmt = $pdo->prepare("DELETE FROM rooms WHERE id = ?");
+    $stmt = $pdo->prepare("DELETE FROM room WHERE id = ?");
     $stmt->execute([$room_id]);
     $deleted = $stmt->rowCount();
     if ($_SESSION['user_id'] == $room_info['user']) {
@@ -415,7 +417,7 @@ function remove_series($pdo, $room_id)
  */
 function count_series($pdo)
 {
-    $stmt = $pdo->prepare('SELECT * FROM users');
+    $stmt = $pdo->prepare('SELECT * FROM user');
     $stmt->execute();
     $room = $stmt->rowCount();
     return $room;
@@ -423,7 +425,7 @@ function count_series($pdo)
 
 function count_users($pdo)
 {
-    $stmt = $pdo->prepare('SELECT * FROM users');
+    $stmt = $pdo->prepare('SELECT * FROM user');
     $stmt->execute();
     $users = $stmt->rowCount();
     return $users;
@@ -454,10 +456,11 @@ function get_user_id()
 
 function get_user_name($user_id, $pdo)
 {
-    $stmt = $pdo->prepare('SELECT name FROM users WHERE username = ?');
+    $stmt = $pdo->prepare('SELECT first_name, last_name FROM user WHERE username = ?');
     $stmt->execute([$user_id]);
     $full_name_info = $stmt->fetch();
-    return $full_name_info;
+    $full_name = $full_name_info["first_name"]." ".$full_name_info["last_name"];
+    return $full_name;
 }
 
 /* register a new user */
@@ -467,8 +470,8 @@ function register_user($pdo, $form_data)
     if (
         empty($form_data['username']) or
         empty($form_data['password']) or
-        empty($form_data['firstname']) or
-        empty($form_data['lastname'])
+        empty($form_data['first_name']) or
+        empty($form_data['last_name'])
     ) {
         return [
             'type' => 'danger',
@@ -478,7 +481,7 @@ function register_user($pdo, $form_data)
 
 
     /* Check if series already exists */
-    $stmt = $pdo->prepare('SELECT * FROM users WHERE username = ?');
+    $stmt = $pdo->prepare('SELECT * FROM user WHERE username = ?');
     $stmt->execute([$form_data['username']]);
     $room = $stmt->rowCount();
     if ($room) {
@@ -491,12 +494,18 @@ function register_user($pdo, $form_data)
     /* hash password */
     $password = password_hash($form_data['password'], PASSWORD_DEFAULT);
     /* Add user */
-    $stmt = $pdo->prepare("INSERT INTO users (username, password, firstname, lastname) VALUES (?, ?, ?, ?)");
+    $stmt = $pdo->prepare("INSERT INTO user (username, password, occupation, role, biography, first_name, last_name, birth_date, email, phone_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->execute([
         $form_data['username'],
         $password,
-        $form_data['firstname'],
-        $form_data['lastname']
+        $form_data['occupation'],
+        $form_data['role'],
+        $form_data['biography'],
+        $form_data['first_name'],
+        $form_data['last_name'],
+        $form_data['birth_date'],
+        $form_data['email'],
+        $form_data['phone_number']
     ]);
     $inserted = $stmt->rowCount();
     if ($inserted == 1) {
@@ -527,7 +536,7 @@ function login_user($pdo, $form_data)
     }
     /* Check if user exists */
     try {
-        $stmt = $pdo->prepare('SELECT * FROM users WHERE username = ?');
+        $stmt = $pdo->prepare('SELECT * FROM user WHERE username = ?');
         $stmt->execute([$form_data['username']]);
         $user_info = $stmt->fetch();
     } catch (PDOException $e) {
@@ -550,7 +559,7 @@ function login_user($pdo, $form_data)
             'message' => 'wrong password.'];
     } else {
         session_start();
-        $_SESSION['user_id'] = $user_info['id'];
+        $_SESSION['user_id'] = $user_info['username'];
         return [
             'type' => 'success',
             'message' => sprintf('%s, you were logged in successfully!',
