@@ -9,7 +9,7 @@
 include 'model.php';
 
 /* Connect to DB */
-$db = connect_db('localhost', 'DDWT_final', 'ddwt22','ddwt22');
+$db = connect_db('localhost', 'ddwt_22_final', 'ddwt22','ddwt22');
 
 // Set credentials for authentication
 $cred = set_cred('DDWT_final', 'DDWT_final');
