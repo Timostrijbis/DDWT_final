@@ -113,6 +113,30 @@ $router->get('overview/', function () use ($template, $db, $nbr_series, $nbr_use
     include use_template('main');
 });
 
+$router->get('rooms/edit/(\d+)', function ($room_id) use ($template, $db, $nbr_series, $nbr_users) {
+    $login_status = check_login();
+
+    /* Get series info from db */
+    $room_info = get_series_info($db, $room_id);
+
+    /* Page info */
+    $page_title = 'Overview';
+    $breadcrumbs = get_breadcrumbs([
+        'Home' => na('/DDWT_final/', False),
+        'Overview' => na('/DDWT_final/overview', True)
+    ]);
+    $navigation = get_navigation($template, 3);
+
+    /* Page content */
+    $page_subtitle = sprintf("Edit %s", $room_info['name']);
+    $page_content = 'Edit the series below.';
+    $submit_btn = "Edit Series";
+    $form_action = '/DDWT22/week2/edit/';
+
+    /* Choose Template */
+    include use_template('edit');
+});
+
 $router->get('rooms/(\d+)', function ($room_id) use ($template, $db, $nbr_series, $nbr_users) {
     /* Get series from db */
     $room_info = get_room_info($db, $room_id);
@@ -131,11 +155,8 @@ $router->get('rooms/(\d+)', function ($room_id) use ($template, $db, $nbr_series
     $page_content = $room_info['price'];
     $nbr_seasons = $room_info['type'];
     $creators = $room_info['size'];
-    session_start();
-    $display_buttons = False;
-    if ($_SESSION['user_id'] == $room_info['owner']) {
-        $display_buttons = True;
-    }
+
+    $display_buttons = True;
     $right_column = use_template('cards');
     /* Choose Template */
     include use_template('series');
@@ -167,6 +188,19 @@ $router->get('add/', function () use ($template, $db, $nbr_series, $nbr_users) {
     }
 });
 
+$router->post('remove/', function () use ($template, $db, $nbr_series, $nbr_users) {
+    /* Remove series in database */
+    $series_id = $_POST['series_id'];
+    $feedback = remove_series($db, $series_id);
+    if (isset($_GET['error_msg'])) {
+        redirect(sprintf('/DDWT_final/overview/?error_msg=%s',
+            urlencode(json_encode($feedback))));
+    } else{
+
+    }
+
+});
+
 /* register get */
 $router->get('register/', function () use ($template, $db) {
     /* Page info */
@@ -182,6 +216,16 @@ $router->get('register/', function () use ($template, $db) {
     $page_content = 'Maak hier een nieuwe accoount aan.';
     /* Choose Template */
     include use_template('register');
+
+    /* Page info */
+    $page_title = 'Add Series';
+    $breadcrumbs = get_breadcrumbs([
+        'DDWT_final' => na('/DDWT_final/', False),
+        '' => na('/DDWT_final/', False),
+        'Add Series' => na('/DDWT_final/new/', True)
+    ]);
+    $navigation = get_navigation($template, 5);
+
 });
 
 /* Register POST */

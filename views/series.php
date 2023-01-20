@@ -9,7 +9,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.1/css/bootstrap.min.css" integrity="sha512-T584yQ/tdRR5QwOpfvDfVQUidzfgc2339Lc8uBDtcp/wYu80d7jwBgAxbyMh0a9YM9F8N3tdErpFI8iaGx6x5g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
         <!-- Own CSS -->
-        <link rel="stylesheet" href="/DDWT22/week2/css/main.css">
+        <link rel="stylesheet" href="/DDWT_final/css/main.css">
 
         <title><?= $page_title ?></title>
     </head>
@@ -55,10 +55,10 @@
                     <?php if ($display_buttons) { ?>
                     <div class="row">
                         <div class="col-sm-2">
-                            <a href="/DDWT22/week2/edit/?series_id=<?= $series_id ?>" role="button" class="btn btn-warning">Edit</a>
+                            <a href="/DDWT_final/edit/<?= $series_id ?>" role="button" class="btn btn-warning">Edit</a>
                         </div>
                         <div class="col-sm-2">
-                            <form action="/DDWT22/week2/remove/" method="POST">
+                            <form action="/DDWT_final/remove/" method="POST">
                                 <input type="hidden" value="<?= $series_id ?>" name="series_id">
                                 <button type="submit" class="btn btn-danger">Remove</button>
                             </form>
