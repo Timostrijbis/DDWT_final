@@ -39,10 +39,6 @@ if (check_login()) {
         4 => Array(
             'name' => 'Add series',
             'url' => '/DDWT_final/add/'
-        ),
-        7 => Array(
-            'name' => 'Messages',
-            'url' => 'DDWT_final/messages/'
         ));
 }
 else {
@@ -54,6 +50,10 @@ else {
         2 => Array(
             'name' => 'Overview',
             'url' => '/DDWT_final/overview/'
+        ),
+        7 => Array(
+            'name' => 'Messages',
+            'url' => '/DDWT_final/messages/'
         ),
         5 => Array(
             'name' => 'Register',
@@ -272,24 +272,6 @@ $router->get('myaccount/', function () use ($template, $db) {
 
     /* Include template */
     include use_template('account');
-});
-
-/* ???? */
-$router->get('myaccount/', function () use ($template, $db) {
-    /* Page info */
-    $page_title = 'My Account';
-    $breadcrumbs = get_breadcrumbs([
-        'Final' => na('/DDWT_final/', False),
-        'Home' => na('/DDWT_final/', False),
-        'Login' => na('/DDWT_final/login/', True)
-    ]);
-    $navigation = get_navigation($template, 6);
-
-    /* Page content */
-    $page_subtitle = 'Log into your account';
-
-    /* Include template */
-    include use_template('login');
 });
 
 /* my account post */

@@ -25,7 +25,15 @@
 
     <div class="row">
 
-        <div class="col-md-12">
+        <div class="col-md-6">
+            <!-- Error message -->
+            <?php if (isset($error_msg)){echo $error_msg;} ?>
+
+            <h1><?= $page_title ?></h1>
+            <h5><?= $page_subtitle ?></h5>
+            <p><?= $page_content ?></p>
+        </div>
+        <div class="col-md-6">
             <!-- Error message -->
             <?php if (isset($error_msg)){echo $error_msg;} ?>
 
@@ -34,7 +42,8 @@
             <p><?= $page_content ?></p>
         </div>
 
-    </div>
+
+
 
     <div class="pd-15">&nbsp;</div>
 
