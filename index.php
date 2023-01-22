@@ -22,6 +22,8 @@ require __DIR__ . '/vendor/autoload.php';
 $nbr_series = count_series($db);
 $nbr_users = count_users($db);
 
+session_start();
+
 if (check_login()) {
     $template = Array(
         1 => Array(
@@ -357,6 +359,12 @@ $router->post('login/', function () use ($template, $db) {
     }
 
     include use_template('login');
+});
+
+$router->get('logout/', function () use ($template, $db, $nbr_series, $nbr_users) {
+    $feedback = logout_user();
+    redirect(sprintf('/DDWT_final/login/?error_msg=%s',
+        urlencode(json_encode($feedback))));
 });
 
 // Set404 for when user puts in wrong path
