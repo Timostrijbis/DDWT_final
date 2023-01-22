@@ -568,8 +568,7 @@ function login_user($pdo, $form_data)
     }
 }
 
-function check_login()
-{
+function check_login()  {
     if (isset($_SESSION['user_id'])) {
         return True;
     } else {

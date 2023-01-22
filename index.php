@@ -39,6 +39,10 @@ if (check_login()) {
         4 => Array(
             'name' => 'Add series',
             'url' => '/DDWT_final/add/'
+        ),
+        7 => Array(
+            'name' => 'Messages',
+            'url' => 'DDWT_final/messages/'
         ));
 }
 else {
@@ -58,10 +62,6 @@ else {
         6 => Array(
             'name' => 'Login',
             'url' => '/DDWT_final/login/'
-        ),
-        7 => Array(
-            'name' => 'Messages',
-            'url' => '/DDWT_final/messages/'
         ));
 }
 
@@ -378,6 +378,12 @@ $router->get('messages/', function () use ($template, $db) {
 
     /* Include template */
     include use_template('messages');
+});
+
+$router->get('logout/', function () use ($template, $db, $nbr_series, $nbr_users) {
+    $feedback = logout_user();
+    redirect(sprintf('/DDWT_final/login/?error_msg=%s',
+        urlencode(json_encode($feedback))));
 });
 
 // Set404 for when user puts in wrong path
