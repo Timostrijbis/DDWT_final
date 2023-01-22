@@ -39,10 +39,6 @@ if (check_login()) {
         4 => Array(
             'name' => 'Add series',
             'url' => '/DDWT_final/add/'
-        ),
-        7 => Array(
-            'name' => 'Messages',
-            'url' => 'DDWT_final/messages/'
         ));
 }
 else {
@@ -62,6 +58,10 @@ else {
         6 => Array(
             'name' => 'Login',
             'url' => '/DDWT_final/login/'
+        ),
+        7 => Array(
+            'name' => 'Messages',
+            'url' => '/DDWT_final/messages/'
         ));
 }
 
@@ -357,6 +357,27 @@ $router->post('login/', function () use ($template, $db) {
     }
 
     include use_template('login');
+});
+
+/* messages get */
+$router->get('messages/', function () use ($template, $db) {
+    /* Page info */
+    $page_title = 'My messages';
+    $breadcrumbs = get_breadcrumbs([
+        'Final' => na('/DDWT_final/', False),
+        'Home' => na('/DDWT_final/', False),
+        'Register' => na('/DDWT_final/messages/', True)
+    ]);
+    $navigation = get_navigation($template, 7);
+    if (isset($_GET['error_msg'])) {
+        $error_msg = get_error($_GET['error_msg']);
+    }
+
+    /* Page content */
+    $page_subtitle = 'Hier zie je je berichten, en kan je een bericht naar iemand sturen';
+
+    /* Include template */
+    include use_template('messages');
 });
 
 // Set404 for when user puts in wrong path
