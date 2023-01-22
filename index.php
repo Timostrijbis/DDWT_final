@@ -37,15 +37,18 @@ if (check_login()) {
         3 => Array(
             'name' => 'My Account',
             'url' => '/DDWT_final/myaccount/'
-        ),
-        4 => Array(
-            'name' => 'Add series',
-            'url' => '/DDWT_final/add/'
+
         ),
         7 => Array(
             'name' => 'Messages',
             'url' => 'DDWT_final/messages/'
         ));
+    if ($_SESSION['user_role'] == 'owner') {
+        $add_room_crumbs = Array(
+            'name' => 'Add Room',
+            'url' => '/DDWT_final/add/');
+        array_push($template, $add_room_crumbs);
+    }
 }
 else {
     $template = Array(

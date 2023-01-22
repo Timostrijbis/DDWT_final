@@ -509,9 +509,10 @@ function register_user($pdo, $form_data)
     ]);
     $inserted = $stmt->rowCount();
     if ($inserted == 1) {
+        login_user($pdo, $form_data);
         return [
             'type' => 'success',
-            'message' => sprintf("User '%s' added to user Overview.", $form_data['username'])
+            'message' => sprintf("User '%s' succesfully made an account.", $form_data['username'])
         ];
         redirect('/DDWT_final/myaccount/');
     } else {
@@ -560,6 +561,7 @@ function login_user($pdo, $form_data)
     } else {
         session_start();
         $_SESSION['user_id'] = $user_info['username'];
+        $_SESSION['user_role'] = $user_info['role'];
         return [
             'type' => 'success',
             'message' => sprintf('%s, you were logged in successfully!',
