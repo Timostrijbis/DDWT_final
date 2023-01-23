@@ -22,8 +22,10 @@ require __DIR__ . '/vendor/autoload.php';
 $nbr_series = count_series($db);
 $nbr_users = count_users($db);
 
+/* Call session on every load to maintain information */
 session_start();
 
+/* Breadcrumb template */
 if (check_login()) {
     $template = Array(
         1 => Array(
@@ -42,6 +44,7 @@ if (check_login()) {
             'name' => 'Messages',
             'url' => '/DDWT_final/messages/'
         ));
+    /* Add add_room crumbs if user is owner */
     if ($_SESSION['user_role'] == 'owner') {
         $add_room_crumbs = Array(
             'name' => 'Add Room',
@@ -59,10 +62,6 @@ else {
             'name' => 'Overview',
             'url' => '/DDWT_final/overview/'
         ),
-        7 => Array(
-            'name' => 'Messages',
-            'url' => '/DDWT_final/messages/'
-        ),
         5 => Array(
             'name' => 'Register',
             'url' => '/DDWT_final/register/'
@@ -76,7 +75,6 @@ else {
 /* Create Router instance */
 $router = new \Bramus\Router\Router();
 
-
 /* landing page */
 $router->get('/', function () use ($template, $db, $nbr_series, $nbr_users) {
     if (new_route('/DDWT_final/', 'get')) {
@@ -84,7 +82,6 @@ $router->get('/', function () use ($template, $db, $nbr_series, $nbr_users) {
         /* Page info */
         $page_title = 'Home';
         $breadcrumbs = get_breadcrumbs([
-            'Final' => na('/DDWT_final/', False),
             'Home' => na('/DDWT_final/', True)
         ]);
         $navigation = get_navigation($template, 1);
@@ -227,7 +224,7 @@ $router->post('add/', function () use ($template, $db, $nbr_series, $nbr_users, 
     include use_template('new');
 });
 
-/* remove post */
+/* Remove room */
 $router->post('remove/', function () use ($template, $db, $nbr_series, $nbr_users) {
     /* Remove series in database */
     $series_id = $_POST['series_id'];
@@ -245,7 +242,6 @@ $router->get('register/', function () use ($template, $db) {
     /* Page info */
     $page_title = 'Register';
     $breadcrumbs = get_breadcrumbs([
-        'Final' => na('/DDWT_final/', False),
         'Register' => na('/DDWT_final/register/', True)
     ]);
     $navigation = get_navigation($template, 5);
@@ -272,7 +268,6 @@ $router->post('register/', function () use ($template, $db) {
     /* Page info */
     $page_title = 'Register';
     $breadcrumbs = get_breadcrumbs([
-        'Final' => na('/DDWT_final/', False),
         'Home' => na('/DDWT_final/', False),
         'Register' => na('/DDWT_final/register/', True)
     ]);
@@ -296,7 +291,6 @@ $router->get('myaccount/', function () use ($template, $db) {
     /* Page info */
     $page_title = 'My Account';
     $breadcrumbs = get_breadcrumbs([
-        'Final' => na('/DDWT_final/', False),
         'Home' => na('/DDWT_final/', False),
         'Register' => na('/DDWT_final/myaccount/', True)
     ]);
@@ -306,10 +300,28 @@ $router->get('myaccount/', function () use ($template, $db) {
     }
 
     /* Page content */
+    $page_content = get_user_info($db);
     $page_subtitle = 'My account';
 
     /* Include template */
     include use_template('account');
+});
+
+/* ???? */
+$router->get('myaccount/', function () use ($template, $db) {
+    /* Page info */
+    $page_title = 'My Account';
+    $breadcrumbs = get_breadcrumbs([
+        'Home' => na('/DDWT_final/', False),
+        'Login' => na('/DDWT_final/login/', True)
+    ]);
+    $navigation = get_navigation($template, 6);
+
+    /* Page content */
+    $page_subtitle = 'Log into your account';
+
+    /* Include template */
+    include use_template('login');
 });
 
 /* my account post */
@@ -317,7 +329,6 @@ $router->post('myaccount/', function () use ($template, $db) {
     /* Page info */
     $page_title = 'My Account';
     $breadcrumbs = get_breadcrumbs([
-        'Final' => na('/DDWT_final/', False),
         'Home' => na('/DDWT_final/', False),
         'Login' => na('/DDWT_final/login/', True)
     ]);
@@ -336,7 +347,7 @@ $router->get('login/', function () use ($template, $db) {
     /* Page info */
     $page_title = 'Login';
     $breadcrumbs = get_breadcrumbs([
-        'DDWT_final' => na('/DDWT_final/', False),
+        'Home' => na('/DDWT_final/', False),
         'Login' => na('/DDWT_final/login', True)
     ]);
     $navigation = get_navigation($template, False);
@@ -357,7 +368,7 @@ $router->post('login/', function () use ($template, $db) {
     /* Page info */
     $page_title = 'Login';
     $breadcrumbs = get_breadcrumbs([
-        'DDWT_final' => na('/DDWT_final/', False),
+        'Home' => na('/DDWT_final/', False),
         'Login' => na('/DDWT_final/login/', True)
     ]);
     $navigation = get_navigation($template, False);
@@ -422,6 +433,7 @@ $router->post('messages/', function () use ($template, $db) {
     include use_template('messages');
 });
 
+/* Logout account */
 $router->get('logout/', function () use ($template, $db, $nbr_series, $nbr_users) {
     $feedback = logout_user();
     redirect(sprintf('/DDWT_final/login/?error_msg=%s',

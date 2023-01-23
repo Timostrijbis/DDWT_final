@@ -483,7 +483,7 @@ function register_user($pdo, $form_data)
     }
 
 
-    /* Check if series already exists */
+    /* Check if user already exists */
     $stmt = $pdo->prepare('SELECT * FROM user WHERE username = ?');
     $stmt->execute([$form_data['username']]);
     $room = $stmt->rowCount();
@@ -571,6 +571,14 @@ function login_user($pdo, $form_data)
                 get_user_name($_SESSION['user_id'], $pdo))
         ];
     }
+}
+
+function get_user_info($pdo) {
+    $stmt = $pdo->prepare('SELECT * FROM user WHERE username = ?');
+    $stmt->execute([$_SESSION['user_id']]);
+    $stmt->fetchAll();
+
+    return 'USER INFO HERE...';
 }
 
 function check_login()  {
