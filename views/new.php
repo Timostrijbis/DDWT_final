@@ -26,7 +26,7 @@
             <div class="row">
 
                 <!-- Left column -->
-                <div class="col-md-8">
+                <div class="col-md-12">
                     <!-- Error message -->
                     <?php if (isset($error_msg)){echo $error_msg;} ?>
 
@@ -35,30 +35,41 @@
                     <p><?= $page_content ?></p>
                     <form action="<?= $form_action ?>" method="POST">
                         <div class="form-group row">
-                            <label for="inputName" class="col-sm-2 col-form-label">Name</label>
+                            <label for="inputName" class="col-sm-2 col-form-label">Address</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="inputName" name="Name" value="<?php if (isset($series_info)){echo $series_info['name'];} ?>" required>
+                                <input type="text" class="form-control" id="inputName" name="address" required>
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for="inputCreator" class="col-sm-2 col-form-label">Creator</label>
+                            <label for="inputCreator" class="col-sm-2 col-form-label">Postal code</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="inputCreator" name="Creator" value="<?php if (isset($series_info)){echo $series_info['creator'];} ?>" required>
+                                <input type="text" class="form-control" id="inputCreator" name="postal" required>
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for="inputSeasons" class="col-sm-2 col-form-label">Seasons</label>
+                            <label for="inputCity" class="col-sm-2 col-form-label">City</label>
                             <div class="col-sm-10">
-                                <input type="number" class="form-control" id="inputCreator" name="Seasons" value="<?php if (isset($series_info)){echo $series_info['seasons'];} ?>" required>
+                                <input type="text" class="form-control" id="inputCreator" name="city" required>
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for="inputAbstract" class="col-sm-2 col-form-label">Abstract</label>
+                            <label for="inputAbstract" class="col-sm-2 col-form-label">Price</label>
                             <div class="col-sm-10">
-                                <textarea class="form-control" id="inputAbstract" rows="3" name="Abstract" required><?php if (isset($series_info)){echo $series_info['abstract'];} ?></textarea>
+                                <input type="number" class="form-control" id="inputAbstract" rows="3" name="price" required>
                             </div>
                         </div>
-                        <?php if(isset($series_id)){ ?><input type="hidden" name="series_id" value="<?php echo $series_id ?>"><?php } ?>
+                        <div class="form-group row">
+                            <label for="inputType" class="col-sm-2 col-form-label">type</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="inputCreator" name="type"  required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="inputSize" class="col-sm-2 col-form-label">Size (square meters)</label>
+                            <div class="col-sm-10">
+                                <input type="number" class="form-control" id="inputCreator" name="size"  required>
+                            </div>
+                        </div>
                         <div class="form-group row">
                             <div class="col-sm-10">
                                 <button type="submit" class="btn btn-primary"><?= $submit_btn ?></button>
@@ -67,12 +78,6 @@
                     </form>
                 </div>
 
-                <!-- Right column -->
-                <div class="col-md-4">
-
-                    <?php include $right_column ?>
-
-                </div>
 
             </div>
         </div>

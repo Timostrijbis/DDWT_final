@@ -250,10 +250,11 @@ function add_series($pdo, $room_info)
 {
     /* Check if all fields are set */
     if (
-        empty($room_info['Name']) or
-        empty($room_info['Creator']) or
-        empty($room_info['Seasons']) or
-        empty($room_info['Abstract'])
+        empty($room_info['address']) or
+        empty($room_info['postal']) or
+        empty($room_info['city']) or
+        empty($room_info['type']) or
+        empty($room_info['size'])
     ) {
         return [
             'type' => 'danger',
@@ -262,40 +263,42 @@ function add_series($pdo, $room_info)
     }
 
     /* Check data type */
-    if (!is_numeric($room_info['Seasons'])) {
+    if (!is_numeric($room_info['size']) or
+    !is_numeric($room_info['size']))
+    {
         return [
             'type' => 'danger',
-            'message' => 'There was an error. You should enter a number in the field Seasons.'
+            'message' => 'There was an error. You should enter a number in the field size.'
         ];
     }
 
-    /* Check if series already exists */
-    $stmt = $pdo->prepare('SELECT * FROM series WHERE name = ?');
-    $stmt->execute([$room_info['Name']]);
+    /* Check if room already exists */
+    $stmt = $pdo->prepare('SELECT * FROM room WHERE address = ?');
+    $stmt->execute([$room_info['address']]);
     $room = $stmt->rowCount();
     if ($room) {
         return [
             'type' => 'danger',
-            'message' => 'This series was already added.'
+            'message' => 'This room was already added.'
         ];
     }
 
-    /* Add Series */
-    session_start();
-    $stmt = $pdo->prepare("INSERT INTO series (name, creator, seasons, abstract, user) VALUES (?, ?, ?, ?, ?)");
+    /* Add room */
+    $stmt = $pdo->prepare("INSERT INTO room (address, postal_code, city, price, type, size, owner) VALUES (?, ?, ?, ?, ?, ?, ?)");
     $stmt->execute([
-        $room_info['Name'],
-        $room_info['Creator'],
-        $room_info['Seasons'],
-        $room_info['Abstract'],
+        $room_info['address'],
+        $room_info['postal'],
+        $room_info['city'],
+        $room_info['price'],
+        $room_info['type'],
+        $room_info['size'],
         $_SESSION['user_id']
-
     ]);
     $inserted = $stmt->rowCount();
     if ($inserted == 1) {
         return [
             'type' => 'success',
-            'message' => sprintf("Series '%s' added to Series Overview.", $room_info['Name'])
+            'message' => sprintf("Room has been added!")
         ];
     } else {
         return [

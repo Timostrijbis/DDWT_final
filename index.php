@@ -38,10 +38,6 @@ if (check_login()) {
             'name' => 'My Account',
             'url' => '/DDWT_final/myaccount/'
         ),
-        4 => Array(
-            'name' => 'Add series',
-            'url' => '/DDWT_final/add/'
-        ),
         7 => Array(
             'name' => 'Messages',
             'url' => '/DDWT_final/messages/'
@@ -175,29 +171,60 @@ $router->get('room/(\d+)', function ($room_id) use ($template, $db, $nbr_series,
 });
 
 
-/* add room page */
-$router->get('add/', function () use ($template, $db, $nbr_series, $nbr_users) {
+/* add room get */
+$router->get('add/', function () use ($template, $db, $nbr_series, $nbr_users, $add_room_crumbs) {
     $login_status = check_login();
     if (!$login_status) {
         redirect("/DDWT_final/login/");
     }
     /* Page info */
-    $page_title = 'Add Series';
+    $page_title = 'Add Room';
     $breadcrumbs = get_breadcrumbs([
         'DDWT_final' => na('/DDWT_final/', False),
         '' => na('/DDWT_final/', False),
-        'Add Series' => na('/DDWT_final/new/', True)
+        'Add Room' => na('/DDWT_final/new/', True)
     ]);
-    $navigation = get_navigation($template, 5);
+    $navigation = get_navigation($template, $add_room_crumbs);
 
     /* Page content */
-    $page_subtitle = 'Add your favorite series';
-    $page_content = 'Fill in the details of you favorite series.';
-    $submit_btn = "Add Series";
+    $page_subtitle = 'Add your room here';
+    $page_content = 'Fill in the details of your room.';
+    $submit_btn = "Submit room";
     $form_action = '/DDWT_final/add/';
     if (isset($_GET['error_msg'])) {
         $error_msg = get_error($_GET['error_msg']);
     }
+    include use_template('new');
+});
+
+/* add room post */
+$router->post('add/', function () use ($template, $db, $nbr_series, $nbr_users, $add_room_crumbs) {
+    $login_status = check_login();
+    if (!$login_status) {
+        redirect("/DDWT_final/login/");
+    }
+    /* Page info */
+    $page_title = 'Add Room';
+    $breadcrumbs = get_breadcrumbs([
+        'DDWT_final' => na('/DDWT_final/', False),
+        '' => na('/DDWT_final/', False),
+        'Add Room' => na('/DDWT_final/new/', True)
+    ]);
+    $navigation = get_navigation($template, $add_room_crumbs);
+
+    /* Page content */
+    $page_subtitle = 'Add your room here';
+    $page_content = 'Fill in the details of your room.';
+    $submit_btn = "Submit room";
+    $form_action = '/DDWT_final/add/';
+
+    $feedback = add_series($db, $_POST);
+    if (isset($_GET['error_msg'])) {
+        $error_msg = get_error($_GET['error_msg']);
+    }
+    redirect(sprintf('/DDWT_final/overview/?error_msg=%s',
+        urlencode(json_encode($feedback))));
+    include use_template('new');
 });
 
 /* remove post */
@@ -211,7 +238,6 @@ $router->post('remove/', function () use ($template, $db, $nbr_series, $nbr_user
     } else{
 
     }
-
 });
 
 /* register get */
