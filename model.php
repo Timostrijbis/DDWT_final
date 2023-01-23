@@ -573,13 +573,19 @@ function login_user($pdo, $form_data)
     }
 }
 
-function get_user_info($pdo) {
+function get_user_info($pdo, $user) {
     $stmt = $pdo->prepare('SELECT * FROM user WHERE username = ?');
-    $stmt->execute([$_SESSION['user_id']]);
-    $stmt->fetchAll();
+    $stmt->execute([$user]);
+    $user_info = $stmt->fetchAll();
+    $user_info_exp = array();
 
-    return 'USER INFO HERE...';
+    foreach ($user_info as $key => $value) {
+        $user_info_exp[$key] = htmlspecialchars($value);
+    }
+    return $user_info_exp;
 }
+
+
 
 function check_login()  {
     if (isset($_SESSION['user_id'])) {

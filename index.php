@@ -109,6 +109,7 @@ $router->get('overview/', function () use ($template, $db, $nbr_series, $nbr_use
     $page_subtitle = 'The overview of all series';
     $page_content = 'Here you find all series listed on Series Overview.';
     $left_content = get_room_table(get_series($db), $db);
+
     if (isset($_GET['error_msg'])) {
         $error_msg = get_error($_GET['error_msg']);
     }
@@ -118,11 +119,12 @@ $router->get('overview/', function () use ($template, $db, $nbr_series, $nbr_use
     include use_template('main');
 });
 
+/* edit get */
 $router->get('rooms/edit/(\d+)', function ($room_id) use ($template, $db, $nbr_series, $nbr_users) {
     $login_status = check_login();
 
     /* Get series info from db */
-    $room_info = get_series_info($db, $room_id);
+    $room_info = get_room_info($db, $room_id);
 
     /* Page info */
     $page_title = 'Overview';
@@ -161,7 +163,10 @@ $router->get('room/(\d+)', function ($room_id) use ($template, $db, $nbr_series,
     $nbr_seasons = $room_info['type'];
     $creators = $room_info['size'];
 
-    $display_buttons = True;
+    $display_buttons = False;
+    if ($_SESSION['user_id'] == $room_info['owner'] {
+        $display_buttons = True
+    })
     $right_column = use_template('cards');
     /* Choose Template */
     include use_template('series');
@@ -169,7 +174,7 @@ $router->get('room/(\d+)', function ($room_id) use ($template, $db, $nbr_series,
 
 
 /* add room get */
-$router->get('add/', function () use ($template, $db, $nbr_series, $nbr_users, $add_room_crumbs) {
+$router->get('add/', function () use ($template, $db, $nbr_series, $nbr_users) {
     $login_status = check_login();
     if (!$login_status) {
         redirect("/DDWT_final/login/");
@@ -181,7 +186,7 @@ $router->get('add/', function () use ($template, $db, $nbr_series, $nbr_users, $
         '' => na('/DDWT_final/', False),
         'Add Room' => na('/DDWT_final/new/', True)
     ]);
-    $navigation = get_navigation($template, $add_room_crumbs);
+    $navigation = get_navigation($template, 5);
 
     /* Page content */
     $page_subtitle = 'Add your room here';
@@ -195,7 +200,7 @@ $router->get('add/', function () use ($template, $db, $nbr_series, $nbr_users, $
 });
 
 /* add room post */
-$router->post('add/', function () use ($template, $db, $nbr_series, $nbr_users, $add_room_crumbs) {
+$router->post('add/', function () use ($template, $db, $nbr_series, $nbr_users) {
     $login_status = check_login();
     if (!$login_status) {
         redirect("/DDWT_final/login/");
@@ -207,7 +212,7 @@ $router->post('add/', function () use ($template, $db, $nbr_series, $nbr_users, 
         '' => na('/DDWT_final/', False),
         'Add Room' => na('/DDWT_final/new/', True)
     ]);
-    $navigation = get_navigation($template, $add_room_crumbs);
+    $navigation = get_navigation($template, 5);
 
     /* Page content */
     $page_subtitle = 'Add your room here';
@@ -300,7 +305,7 @@ $router->get('myaccount/', function () use ($template, $db) {
     }
 
     /* Page content */
-    $page_content = get_user_info($db);
+    $page_content = get_user_info($db, $_SESSION['user_id']);
     $page_subtitle = 'My account';
 
     /* Include template */
