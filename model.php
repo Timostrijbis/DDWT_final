@@ -318,11 +318,12 @@ function update_room($pdo, $room_info)
 {
     /* Check if all fields are set */
     if (
-        empty($room_info['Name']) or
-        empty($room_info['Creator']) or
-        empty($room_info['Seasons']) or
-        empty($room_info['Abstract']) or
-        empty($room_info['room_id'])
+        empty($room_info['address']) or
+        empty($room_info['postal']) or
+        empty($room_info['city']) or
+        empty($room_info['price']) or
+        empty($room_info['type']) or
+        empty($room_info['size'])
     ) {
         return [
             'type' => 'danger',
@@ -331,37 +332,36 @@ function update_room($pdo, $room_info)
     }
 
     /* Check data type */
-    if (!is_numeric($room_info['Seasons'])) {
+    if (
+        !is_numeric($room_info['price']) or
+        !is_numeric($room_info['size'])) {
         return [
             'type' => 'danger',
             'message' => 'There was an error. You should enter a number in the field Seasons.'
         ];
     }
 
-    /* Get current room name */
-    $stmt = $pdo->prepare('SELECT * FROM room WHERE id = ?');
-    $stmt->execute([$room_info['room_id']]);
-    $room = $stmt->fetch();
-    $current_name = $room['name'];
 
     /* Check if room already exists */
-    $stmt = $pdo->prepare('SELECT * FROM room WHERE name = ?');
-    $stmt->execute([$room_info['Name']]);
-    $room = $stmt->fetch();
-    if ($room_info['Name'] == $room['name'] and $room['name'] != $current_name) {
+    $stmt = $pdo->prepare('SELECT * FROM room WHERE id = ?');
+    $stmt->execute([$room_info['id']]);
+    $room = $stmt->rowCount();
+    if ($room) {
         return [
             'type' => 'danger',
-            'message' => sprintf("The name of the room cannot be changed. %s already exists.", $room_info['Name'])
+            'message' => 'This address is already taken.'
         ];
     }
 
     /* Update room */
-    $stmt = $pdo->prepare("UPDATE room SET name = ?, creator = ?, seasons = ?, abstract = ? WHERE id = ?");
+    $stmt = $pdo->prepare("UPDATE room SET address = ?, postal_code = ?, city = ?, price = ?, type = ?, size = ?  WHERE id = ?");
     $stmt->execute([
-        $room_info['Name'],
-        $room_info['Creator'],
-        $room_info['Seasons'],
-        $room_info['Abstract'],
+        $room_info['address'],
+        $room_info['postal'],
+        $room_info['city'],
+        $room_info['price'],
+        $room_info['type'],
+        $room_info['size'],
         $room_info['room_id']
     ]);
     $updated = $stmt->rowCount();
@@ -390,14 +390,13 @@ function update_room($pdo, $room_info)
 function remove_room($pdo, $room_id)
 {
     /* Get room info */
-    session_start();
     $room_info = get_room_info($pdo, $room_id);
 
     /* Delete room */
     $stmt = $pdo->prepare("DELETE FROM room WHERE id = ?");
     $stmt->execute([$room_id]);
     $deleted = $stmt->rowCount();
-    if ($_SESSION['user_id'] == $room_info['user']) {
+    if ($_SESSION['user_id'] == $room_info['owner']) {
         if ($deleted == 1) {
             return [
                 'type' => 'success',

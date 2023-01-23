@@ -26,51 +26,57 @@
     <div class="row">
 
         <!-- Left column -->
-        <div class="col-md-8">
+        <div class="col-md-12">
             <!-- Error message -->
             <?php if (isset($error_msg)){echo $error_msg;} ?>
 
             <h1><?= $page_title ?></h1>
             <h5><?= $page_subtitle ?></h5>
-            <table class="table">
-                <tbody>
-                <tr>
-                    <th scope="row">Price</th>
-                    <td><?= $page_content ?></td>
-                </tr>
-                <tr>
-                    <th scope="row">Creators</th>
-                    <td><?= $creators ?></td>
-                </tr>
-                <tr>
-                    <th scope="row">Number of seasons</th>
-                    <td><?= $nbr_seasons ?></td>
-                </tr>
-                <tr>
-                    <th scope="row">Added by user</th>
-                    <td><?= $added_by ?></td>
-                </tr>
-                </tbody>
-            </table>
-            <?php if ($display_buttons) { ?>
-                <div class="row">
-                    <div class="col-sm-2">
-                        <a href="/DDWT_final/edit/<?= $room_id ?>" role="button" class="btn btn-warning">Edit</a>
-                    </div>
-                    <div class="col-sm-2">
-                        <form action="/DDWT_final/remove/" method="POST">
-                            <input type="hidden" value="<?= $series_id ?>" name="series_id">
-                            <button type="submit" class="btn btn-danger">Remove</button>
-                        </form>
+
+            <form action="/DDWT_final/edit/" method="POST">
+                <div class="form-group row">
+                    <label for="inputName" class="col-sm-2 col-form-label">New Address</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="inputName" name="address" required>
                     </div>
                 </div>
-            <?php } ?>
-        </div>
+                <div class="form-group row">
+                    <label for="inputCreator" class="col-sm-2 col-form-label">New Postal Code</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="inputCreator" name="postal" required>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="inputCity" class="col-sm-2 col-form-label">New City</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="inputCreator" name="city" required>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="inputAbstract" class="col-sm-2 col-form-label">New Price</label>
+                    <div class="col-sm-10">
+                        <input type="number" class="form-control" id="inputAbstract" rows="3" name="price" required>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="inputType" class="col-sm-2 col-form-label">New type</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="inputCreator" name="type"  required>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="inputSize" class="col-sm-2 col-form-label">New Size (square meters)</label>
+                    <div class="col-sm-10">
+                        <input type="number" class="form-control" id="inputCreator" name="size"  required>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-10">
+                        <button type="submit" class="btn btn-primary"><?= $submit_btn ?></button>
+                    </div>
+                </div>
+            </form>
 
-        <!-- Right column -->
-        <div class="col-md-4">
-
-            <?php include $right_column ?>
 
         </div>
 

@@ -137,12 +137,43 @@ $router->get('edit/(\d+)', function ($room_id) use ($template, $db, $nbr_room, $
     $page_subtitle = sprintf("Edit %s", $room_info['address']);
     $page_content = 'Edit the Room below.';
     $submit_btn = "Edit Room";
-    $form_action = '/DDWT22/week2/edit/';
 
     /* Choose Template */
     include use_template('edit');
 });
 
+/* edit room info post */
+$router->post('edit/(\d+)', function ($room_id) use ($template, $db, $nbr_room, $nbr_users) {
+    $login_status = check_login();
+
+    /* Get room info from db */
+    $room_info = get_room_info($db, $room_id);
+
+    /* Page info */
+    $page_title = 'Overview';
+    $breadcrumbs = get_breadcrumbs([
+        'Home' => na('/DDWT_final/', False),
+        'Overview' => na('/DDWT_final/overview', True)
+    ]);
+    $navigation = get_navigation($template, 3);
+
+    /* Page content */
+    $page_subtitle = sprintf("Edit %s", $room_info['address']);
+    $page_content = 'Edit the Room below.';
+    $submit_btn = "Edit Room";
+    $feedback = update_room($db, $_POST);
+    if (isset($_GET['error_msg'])) {
+        $error_msg = get_error($_GET['error_msg']);
+    }
+    redirect(sprintf('/DDWT_final/overview/?error_msg=%s',
+        urlencode(json_encode($feedback))));
+
+
+    /* Choose Template */
+    include use_template('edit');
+});
+
+/* Room info get */
 $router->get('room/(\d+)', function ($room_id) use ($template, $db, $nbr_room, $nbr_users) {
     /* Get room from db */
     $room_info = get_room_info($db, $room_id);
@@ -231,8 +262,8 @@ $router->post('add/', function () use ($template, $db, $nbr_room, $nbr_users) {
 /* Remove room */
 $router->post('remove/', function () use ($template, $db, $nbr_room, $nbr_users) {
     /* Remove room from database */
-    $room_id = $_POST['series_id'];
-    $feedback = remove_series($db, $room_id);
+    $room_id = $_POST['room_id'];
+    $feedback = remove_room($db, $room_id);
     if (isset($_GET['error_msg'])) {
         redirect(sprintf('/DDWT_final/overview/?error_msg=%s',
             urlencode(json_encode($feedback))));
