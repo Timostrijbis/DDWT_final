@@ -1,0 +1,31 @@
+CREATE
+- Users
+- Rooms (by owner-role users)
+- Opt-ins (by tenant-role users)
+- Messages
+
+READ
+- OWNER sees their own rooms
+- TENANT sees ALL rooms
+- OWNER sees opt-ins to their rooms.
+- OWNER sees users that opted into their rooms.
+- TENANT sees their initiated opt-ins.
+- Users can read Messages.
+
+UPDATE
+- OWNER can update information on their rooms.
+- Users can update information in ONLY their own profile.
+
+DELETE
+- OWNER can delete ONLY their own rooms.
+- TENANT can delete ONLY their own opt-ins.
+- Users can delete ONLY their own profile.
+- Deleting a profile also removes all associated rooms and opt-ins.
+
+REQS
+- MVC
+- Prevent redundancy
+- Use docstring and comments
+- Consistent Feedback messages
+- Security and Permission checks
+- BCNF database
