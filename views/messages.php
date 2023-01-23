@@ -25,21 +25,15 @@
 
     <div class="row">
 
-        <div class="col-md-6">
+        <div class="col-md-12">
             <!-- Error message -->
             <?php if (isset($error_msg)){echo $error_msg;} ?>
 
             <h1><?= $page_title ?></h1>
             <h5><?= $page_subtitle ?></h5>
-            <p><?= $page_content ?></p>
-        </div>
-        <div class="col-md-6">
-            <!-- Error message -->
-            <?php if (isset($error_msg)){echo $error_msg;} ?>
 
-            <h1><?= $page_title ?></h1>
-            <h5><?= $page_subtitle ?></h5>
-            <p><?= $page_content ?></p>
+
+
         </div>
 
 
@@ -49,7 +43,30 @@
 
     <div class="row">
 
+        <div class="col-md-8">
+            <p><?= $page_content ?></p>
+        </div>
 
+        <div class="card m-4">
+            <div class="card-header">
+                Send message
+            </div>
+            <div class="card-body">
+                <form action="/DDWT_final/messages/" method="POST">
+                    <div class="form-group">
+                        <label for="inputUsername">Send to:</label>
+                        <input type="text" class="form-control" id="inputUsername" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputPassword">Message:</label>
+                        <textarea type="text" class="form-control" id="inputPassword" rows="4" cols="30" name="message_text" required> </textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Send message</button>
+                </form>
+            </div>
+
+
+        </div>
 
     </div>
 </div>

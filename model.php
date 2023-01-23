@@ -595,3 +595,95 @@ function set_cred($username, $password){
     ];
 }
 
+function get_messages($username, $pdo){
+    $stmt = $pdo->prepare('SELECT * FROM message WHERE receiver_username = ?');
+    $stmt->execute([$username]);
+    $message = $stmt->fetchAll();
+    $message_exp = array();
+
+    /* Create array with htmlspecialchars */
+    foreach ($message as $key => $value) {
+        foreach ($value as $user_key => $user_input) {
+            $message_exp[$key][$user_key] = htmlspecialchars($user_input);
+        }
+    }
+    return $message;
+}
+
+
+function get_message_table($message, $pdo)
+{
+    $table_exp = '
+    <table class="table table-hover">
+    <thead
+    <tr>
+        <th scope="col">From:</th>
+        <th scope="col">Content</th>
+        <th scope="col">Date</th>
+        <th scope="col"></th>
+    </tr>
+    </thead>
+    <tbody>';
+    foreach ($message as &$value) {
+        $table_exp .= '
+        <tr>
+            <td scope="row">' . $value['sender_username'] . '</td>
+            <td scope="row">' . $value['text'] . '</td>
+            <td scope="row">' . $value['datetime'] . '</td>
+            <td><a href="/DDWT_final/message/' . $value['id'] . '" role="button" class="btn btn-primary">More info</a></td>
+        </tr>
+        ';
+    }
+    $table_exp .= '
+    </tbody>
+    </table>
+    ';
+    return $table_exp;
+}
+
+function send_message($pdo, $message){
+    /* Check if all fields are set */
+    if (
+        empty($message['username']) or
+        empty($message['message_text'])
+    ) {
+        return [
+            'type' => 'danger',
+            'message' => 'There was an error. Not all fields were filled in.'
+        ];
+    }
+
+    /*check if the user exists */
+    $stmt = $pdo->prepare('SELECT * FROM user WHERE username = ?');
+    $stmt->execute([$message['username']]);
+    $room = $stmt->rowCount();
+    if ($room) {
+        $stmt = $pdo->prepare("INSERT INTO message (datetime, text, sender_username , receiver_username) VALUES (?, ?, ?, ?)");
+        $stmt->execute([
+            date("Y-m-d H:i:s"),
+            $message['message_text'],
+            $_SESSION['user_id'],
+            $message['username'],
+
+        ]);
+        $inserted = $stmt->rowCount();
+        if ($inserted == 1) {
+            return [
+                'type' => 'success',
+                'message' => sprintf("Message sent!")
+            ];
+        } else {
+            return [
+                'type' => 'danger',
+                'message' => 'There was an error. The message was not sent. Try it again.'
+            ];
+        }
+    } else {
+        return [
+            'type' => 'danger',
+            'message' => 'This user does not exist.'
+        ];
+    }
+
+
+}

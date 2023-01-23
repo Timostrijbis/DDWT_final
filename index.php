@@ -44,7 +44,7 @@ if (check_login()) {
         ),
         7 => Array(
             'name' => 'Messages',
-            'url' => 'DDWT_final/messages/'
+            'url' => '/DDWT_final/messages/'
         ));
     if ($_SESSION['user_role'] == 'owner') {
         $add_room_crumbs = Array(
@@ -200,6 +200,7 @@ $router->get('add/', function () use ($template, $db, $nbr_series, $nbr_users) {
     }
 });
 
+/* remove post */
 $router->post('remove/', function () use ($template, $db, $nbr_series, $nbr_users) {
     /* Remove series in database */
     $series_id = $_POST['series_id'];
@@ -254,7 +255,6 @@ $router->post('register/', function () use ($template, $db) {
     /* Page content */
     $page_subtitle = 'Register account';
 
-    /* Add series to database */
     $feedback = register_user($db, $_POST);
     if (isset($_GET['error_msg'])) {
         $error_msg = get_error($_GET['error_msg']);
@@ -284,24 +284,6 @@ $router->get('myaccount/', function () use ($template, $db) {
 
     /* Include template */
     include use_template('account');
-});
-
-/* ???? */
-$router->get('myaccount/', function () use ($template, $db) {
-    /* Page info */
-    $page_title = 'My Account';
-    $breadcrumbs = get_breadcrumbs([
-        'Final' => na('/DDWT_final/', False),
-        'Home' => na('/DDWT_final/', False),
-        'Login' => na('/DDWT_final/login/', True)
-    ]);
-    $navigation = get_navigation($template, 6);
-
-    /* Page content */
-    $page_subtitle = 'Log into your account';
-
-    /* Include template */
-    include use_template('login');
 });
 
 /* my account post */
@@ -369,6 +351,49 @@ $router->post('login/', function () use ($template, $db) {
     }
 
     include use_template('login');
+});
+
+/* messages get */
+$router->get('messages/', function () use ($template, $db) {
+    /* Page info */
+    $page_title = 'Berichten';
+    $breadcrumbs = get_breadcrumbs([
+        'DDWT_final' => na('/DDWT_final/', False),
+        'Login' => na('/DDWT_final/login', True)
+    ]);
+    $navigation = get_navigation($template, False);
+
+    /* Page content */
+    if (isset($_GET['error_msg'])) {
+        $error_msg = get_error($_GET['error_msg']);
+    }
+    $page_subtitle = 'Mijn berichten';
+    $page_content = get_message_table(get_messages(get_user_id(), $db), $db);
+
+    /* Choose Template */
+    include use_template('messages');
+});
+
+/* messages post */
+$router->post('messages/', function () use ($template, $db) {
+
+    /* Page info */
+    $page_title = 'Berichten';
+    $breadcrumbs = get_breadcrumbs([
+        'DDWT_final' => na('/DDWT_final/', False),
+        'Login' => na('/DDWT_final/login', True)
+    ]);
+    $navigation = get_navigation($template, False);
+
+    /* Page content */
+    $feedback = send_message($db, $_POST);
+    if (isset($_GET['error_msg'])) {
+        $error_msg = get_error($_GET['error_msg']);
+    }
+    redirect(sprintf('/DDWT_final/messages/?error_msg=%s',
+        urlencode(json_encode($feedback))));
+
+    include use_template('messages');
 });
 
 $router->get('logout/', function () use ($template, $db, $nbr_series, $nbr_users) {
