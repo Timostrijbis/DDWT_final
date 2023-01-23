@@ -55,7 +55,7 @@
                     <?php if ($display_buttons) { ?>
                     <div class="row">
                         <div class="col-sm-2">
-                            <a href="/DDWT_final/edit/<?= $series_id ?>" role="button" class="btn btn-warning">Edit</a>
+                            <a href="/DDWT_final/edit/<?= $room_id ?>" role="button" class="btn btn-warning">Edit</a>
                         </div>
                         <div class="col-sm-2">
                             <form action="/DDWT_final/remove/" method="POST">

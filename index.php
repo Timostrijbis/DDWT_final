@@ -18,8 +18,8 @@ $cred = set_cred('DDWT_final', 'DDWT_final');
 require __DIR__ . '/vendor/autoload.php';
 
 /* Section for redundant code */
-/* Get Number of Series */
-$nbr_series = count_series($db);
+/* Get Number of rooms */
+$nbr_room = count_room($db);
 $nbr_users = count_users($db);
 
 /* Call session on every load to maintain information */
@@ -76,7 +76,7 @@ else {
 $router = new \Bramus\Router\Router();
 
 /* landing page */
-$router->get('/', function () use ($template, $db, $nbr_series, $nbr_users) {
+$router->get('/', function () use ($template, $db, $nbr_room, $nbr_users) {
     if (new_route('/DDWT_final/', 'get')) {
 
         /* Page info */
@@ -96,7 +96,7 @@ $router->get('/', function () use ($template, $db, $nbr_series, $nbr_users) {
 });
 
 /* Overview page */
-$router->get('overview/', function () use ($template, $db, $nbr_series, $nbr_users) {
+$router->get('overview/', function () use ($template, $db, $nbr_room, $nbr_users) {
     /* Page info */
     $page_title = 'Overview';
     $breadcrumbs = get_breadcrumbs([
@@ -106,9 +106,9 @@ $router->get('overview/', function () use ($template, $db, $nbr_series, $nbr_use
     $navigation = get_navigation($template, 2);
 
     /* Page content */
-    $page_subtitle = 'The overview of all series';
-    $page_content = 'Here you find all series listed on Series Overview.';
-    $left_content = get_room_table(get_series($db), $db);
+    $page_subtitle = 'The overview of all Rooms';
+    $page_content = 'Here you find all available rooms listed on rooms Overview.';
+    $left_content = get_room_table(get_room($db), $db);
     if (isset($_GET['error_msg'])) {
         $error_msg = get_error($_GET['error_msg']);
     }
@@ -118,11 +118,12 @@ $router->get('overview/', function () use ($template, $db, $nbr_series, $nbr_use
     include use_template('main');
 });
 
-$router->get('rooms/edit/(\d+)', function ($room_id) use ($template, $db, $nbr_series, $nbr_users) {
+/* edit room info get */
+$router->get('edit/(\d+)', function ($room_id) use ($template, $db, $nbr_room, $nbr_users) {
     $login_status = check_login();
 
-    /* Get series info from db */
-    $room_info = get_series_info($db, $room_id);
+    /* Get room info from db */
+    $room_info = get_room_info($db, $room_id);
 
     /* Page info */
     $page_title = 'Overview';
@@ -133,17 +134,17 @@ $router->get('rooms/edit/(\d+)', function ($room_id) use ($template, $db, $nbr_s
     $navigation = get_navigation($template, 3);
 
     /* Page content */
-    $page_subtitle = sprintf("Edit %s", $room_info['name']);
-    $page_content = 'Edit the series below.';
-    $submit_btn = "Edit Series";
+    $page_subtitle = sprintf("Edit %s", $room_info['address']);
+    $page_content = 'Edit the Room below.';
+    $submit_btn = "Edit Room";
     $form_action = '/DDWT22/week2/edit/';
 
     /* Choose Template */
     include use_template('edit');
 });
 
-$router->get('room/(\d+)', function ($room_id) use ($template, $db, $nbr_series, $nbr_users) {
-    /* Get series from db */
+$router->get('room/(\d+)', function ($room_id) use ($template, $db, $nbr_room, $nbr_users) {
+    /* Get room from db */
     $room_info = get_room_info($db, $room_id);
 
     /* Page info */
@@ -172,7 +173,7 @@ $router->get('room/(\d+)', function ($room_id) use ($template, $db, $nbr_series,
 
 
 /* add room get */
-$router->get('add/', function () use ($template, $db, $nbr_series, $nbr_users) {
+$router->get('add/', function () use ($template, $db, $nbr_room, $nbr_users) {
     $login_status = check_login();
     if (!$login_status) {
         redirect("/DDWT_final/login/");
@@ -198,7 +199,7 @@ $router->get('add/', function () use ($template, $db, $nbr_series, $nbr_users) {
 });
 
 /* add room post */
-$router->post('add/', function () use ($template, $db, $nbr_series, $nbr_users) {
+$router->post('add/', function () use ($template, $db, $nbr_room, $nbr_users) {
     $login_status = check_login();
     if (!$login_status) {
         redirect("/DDWT_final/login/");
@@ -228,10 +229,10 @@ $router->post('add/', function () use ($template, $db, $nbr_series, $nbr_users) 
 });
 
 /* Remove room */
-$router->post('remove/', function () use ($template, $db, $nbr_series, $nbr_users) {
-    /* Remove series in database */
-    $series_id = $_POST['series_id'];
-    $feedback = remove_series($db, $series_id);
+$router->post('remove/', function () use ($template, $db, $nbr_room, $nbr_users) {
+    /* Remove room from database */
+    $room_id = $_POST['series_id'];
+    $feedback = remove_series($db, $room_id);
     if (isset($_GET['error_msg'])) {
         redirect(sprintf('/DDWT_final/overview/?error_msg=%s',
             urlencode(json_encode($feedback))));
@@ -256,11 +257,11 @@ $router->get('register/', function () use ($template, $db) {
     include use_template('register');
 
     /* Page info */
-    $page_title = 'Add Series';
+    $page_title = 'Add Room';
     $breadcrumbs = get_breadcrumbs([
         'DDWT_final' => na('/DDWT_final/', False),
         '' => na('/DDWT_final/', False),
-        'Add Series' => na('/DDWT_final/new/', True)
+        'Add room' => na('/DDWT_final/new/', True)
     ]);
     $navigation = get_navigation($template, 5);
 
@@ -437,7 +438,7 @@ $router->post('messages/', function () use ($template, $db) {
 });
 
 /* Logout account */
-$router->get('logout/', function () use ($template, $db, $nbr_series, $nbr_users) {
+$router->get('logout/', function () use ($template, $db, $nbr_room, $nbr_users) {
     $feedback = logout_user();
     redirect(sprintf('/DDWT_final/login/?error_msg=%s',
         urlencode(json_encode($feedback))));
