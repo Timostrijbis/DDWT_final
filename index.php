@@ -137,12 +137,43 @@ $router->get('edit/(\d+)', function ($room_id) use ($template, $db, $nbr_room, $
     $page_subtitle = sprintf("Edit %s", $room_info['address']);
     $page_content = 'Edit the Room below.';
     $submit_btn = "Edit Room";
-    $form_action = '/DDWT22/week2/edit/';
 
     /* Choose Template */
     include use_template('edit');
 });
 
+/* edit room info post */
+$router->post('edit/(\d+)', function ($room_id) use ($template, $db, $nbr_room, $nbr_users) {
+    $login_status = check_login();
+
+    /* Get room info from db */
+    $room_info = get_room_info($db, $room_id);
+
+    /* Page info */
+    $page_title = 'Overview';
+    $breadcrumbs = get_breadcrumbs([
+        'Home' => na('/DDWT_final/', False),
+        'Overview' => na('/DDWT_final/overview', True)
+    ]);
+    $navigation = get_navigation($template, 3);
+
+    /* Page content */
+    $page_subtitle = sprintf("Edit %s", $room_info['address']);
+    $page_content = 'Edit the Room below.';
+    $submit_btn = "Edit Room";
+    $feedback = update_room($db, $_POST);
+    if (isset($_GET['error_msg'])) {
+        $error_msg = get_error($_GET['error_msg']);
+    }
+    redirect(sprintf('/DDWT_final/overview/?error_msg=%s',
+        urlencode(json_encode($feedback))));
+
+
+    /* Choose Template */
+    include use_template('edit');
+});
+
+/* Room info get */
 $router->get('room/(\d+)', function ($room_id) use ($template, $db, $nbr_room, $nbr_users) {
     /* Get room from db */
     $room_info = get_room_info($db, $room_id);
@@ -163,9 +194,9 @@ $router->get('room/(\d+)', function ($room_id) use ($template, $db, $nbr_room, $
     $creators = $room_info['size'];
 
     $display_buttons = False;
-    if ($_SESSION['user_id'] == $room_info['owner'] {
-        $display_buttons = True
-    })
+    if ($_SESSION['user_id'] == $room_info['owner']) {
+        $display_buttons = True;
+    }
     $right_column = use_template('cards');
     /* Choose Template */
     include use_template('series');
@@ -185,7 +216,7 @@ $router->get('add/', function () use ($template, $db, $nbr_room, $nbr_users) {
         '' => na('/DDWT_final/', False),
         'Add Room' => na('/DDWT_final/new/', True)
     ]);
-    $navigation = get_navigation($template, 5);
+    $navigation = get_navigation($template, 4);
 
     /* Page content */
     $page_subtitle = 'Add your room here';
@@ -199,7 +230,7 @@ $router->get('add/', function () use ($template, $db, $nbr_room, $nbr_users) {
 });
 
 /* add room post */
-$router->post('add/', function () use ($template, $db, $nbr_series, $nbr_users) {
+$router->post('add/', function () use ($template, $db, $nbr_room, $nbr_users) {
     $login_status = check_login();
     if (!$login_status) {
         redirect("/DDWT_final/login/");
@@ -229,10 +260,10 @@ $router->post('add/', function () use ($template, $db, $nbr_series, $nbr_users) 
 });
 
 /* Remove room */
-$router->post('remove/', function () use ($template, $db, $nbr_series, $nbr_users) {
-    /* Remove series in database */
-    $series_id = $_POST['series_id'];
-    $feedback = remove_series($db, $series_id);
+$router->post('remove/', function () use ($template, $db, $nbr_room, $nbr_users) {
+    /* Remove room from database */
+    $room_id = $_POST['room_id'];
+    $feedback = remove_room($db, $room_id);
     if (isset($_GET['error_msg'])) {
         redirect(sprintf('/DDWT_final/overview/?error_msg=%s',
             urlencode(json_encode($feedback))));
@@ -257,11 +288,11 @@ $router->get('register/', function () use ($template, $db) {
     include use_template('register');
 
     /* Page info */
-    $page_title = 'Add Series';
+    $page_title = 'Add Room';
     $breadcrumbs = get_breadcrumbs([
         'DDWT_final' => na('/DDWT_final/', False),
         '' => na('/DDWT_final/', False),
-        'Add Series' => na('/DDWT_final/new/', True)
+        'Add room' => na('/DDWT_final/new/', True)
     ]);
     $navigation = get_navigation($template, 5);
 
@@ -438,7 +469,7 @@ $router->post('messages/', function () use ($template, $db) {
 });
 
 /* Logout account */
-$router->get('logout/', function () use ($template, $db, $nbr_series, $nbr_users) {
+$router->get('logout/', function () use ($template, $db, $nbr_room, $nbr_users) {
     $feedback = logout_user();
     redirect(sprintf('/DDWT_final/login/?error_msg=%s',
         urlencode(json_encode($feedback))));
