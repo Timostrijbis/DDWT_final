@@ -110,7 +110,7 @@ function get_navigation($template, $active_id)
 {
     $navigation_exp = '
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand">Series Overview</a>
+    <a class="navbar-brand">Room Overview</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
     </button>
@@ -135,8 +135,8 @@ function get_navigation($template, $active_id)
 }
 
 /**
- * Creates a Bootstrap table with a list of series
- * @param array $room Associative array of series
+ * Creates a Bootstrap table with a list of room
+ * @param array $room Associative array of room
  * @return string
  */
 function get_room_table($room, $pdo)
@@ -181,11 +181,11 @@ function p_print($input)
 }
 
 /**
- * Get array with all listed series from the database
+ * Get array with all listed rooms from the database
  * @param PDO $pdo Database object
- * @return array Associative array with all series
+ * @return array Associative array with all rooms
  */
-function get_series($pdo)
+function get_room($pdo)
 {
     $stmt = $pdo->prepare('SELECT * FROM room');
     $stmt->execute();
@@ -202,9 +202,9 @@ function get_series($pdo)
 }
 
 /**
- * Generates an array with series information
+ * Generates an array with room information
  * @param PDO $pdo Database object
- * @param int $room_id ID from the series
+ * @param int $room_id ID from the room
  * @return mixed
  */
 function get_room_info($pdo, $room_id)
@@ -241,12 +241,12 @@ function get_error($feedback)
 }
 
 /**
- * Add series to the database
+ * Add room to the database
  * @param PDO $pdo Database object
- * @param array $room_info Associative array with series info
+ * @param array $room_info Associative array with room info
  * @return array Associative array with key type and message
  */
-function add_series($pdo, $room_info)
+function add_room($pdo, $room_info)
 {
     /* Check if all fields are set */
     if (
@@ -303,18 +303,18 @@ function add_series($pdo, $room_info)
     } else {
         return [
             'type' => 'danger',
-            'message' => 'There was an error. The series was not added. Try it again.'
+            'message' => 'There was an error. The room was not added. Try it again.'
         ];
     }
 }
 
 /**
- * Updates a series in the database
+ * Updates a room in the database
  * @param PDO $pdo Database object
- * @param array $room_info Associative array with series info
+ * @param array $room_info Associative array with room info
  * @return array
  */
-function update_series($pdo, $room_info)
+function update_room($pdo, $room_info)
 {
     /* Check if all fields are set */
     if (
@@ -322,7 +322,7 @@ function update_series($pdo, $room_info)
         empty($room_info['Creator']) or
         empty($room_info['Seasons']) or
         empty($room_info['Abstract']) or
-        empty($room_info['series_id'])
+        empty($room_info['room_id'])
     ) {
         return [
             'type' => 'danger',
@@ -338,43 +338,43 @@ function update_series($pdo, $room_info)
         ];
     }
 
-    /* Get current series name */
-    $stmt = $pdo->prepare('SELECT * FROM series WHERE id = ?');
-    $stmt->execute([$room_info['series_id']]);
+    /* Get current room name */
+    $stmt = $pdo->prepare('SELECT * FROM room WHERE id = ?');
+    $stmt->execute([$room_info['room_id']]);
     $room = $stmt->fetch();
     $current_name = $room['name'];
 
-    /* Check if series already exists */
-    $stmt = $pdo->prepare('SELECT * FROM series WHERE name = ?');
+    /* Check if room already exists */
+    $stmt = $pdo->prepare('SELECT * FROM room WHERE name = ?');
     $stmt->execute([$room_info['Name']]);
     $room = $stmt->fetch();
     if ($room_info['Name'] == $room['name'] and $room['name'] != $current_name) {
         return [
             'type' => 'danger',
-            'message' => sprintf("The name of the series cannot be changed. %s already exists.", $room_info['Name'])
+            'message' => sprintf("The name of the room cannot be changed. %s already exists.", $room_info['Name'])
         ];
     }
 
-    /* Update Series */
-    $stmt = $pdo->prepare("UPDATE series SET name = ?, creator = ?, seasons = ?, abstract = ? WHERE id = ?");
+    /* Update room */
+    $stmt = $pdo->prepare("UPDATE room SET name = ?, creator = ?, seasons = ?, abstract = ? WHERE id = ?");
     $stmt->execute([
         $room_info['Name'],
         $room_info['Creator'],
         $room_info['Seasons'],
         $room_info['Abstract'],
-        $room_info['series_id']
+        $room_info['room_id']
     ]);
     $updated = $stmt->rowCount();
     if ($_SESSION['user_id'] == $room_info['user']) {
         if ($updated == 1) {
             return [
                 'type' => 'success',
-                'message' => sprintf("Series '%s' was edited!", $room_info['Name'])
+                'message' => sprintf("room '%s' was edited!", $room_info['Name'])
             ];
         } else {
             return [
                 'type' => 'warning',
-                'message' => 'The series was not edited. No changes were detected.'
+                'message' => 'The room was not edited. No changes were detected.'
             ];
         }
     }
@@ -382,18 +382,18 @@ function update_series($pdo, $room_info)
 }
 
 /**
- * Removes a series with a specific series ID
+ * Removes a room with a specific room ID
  * @param PDO $pdo Database object
- * @param int $room_id ID of the series
+ * @param int $room_id ID of the room
  * @return array
  */
-function remove_series($pdo, $room_id)
+function remove_room($pdo, $room_id)
 {
-    /* Get series info */
+    /* Get room info */
     session_start();
     $room_info = get_room_info($pdo, $room_id);
 
-    /* Delete Series */
+    /* Delete room */
     $stmt = $pdo->prepare("DELETE FROM room WHERE id = ?");
     $stmt->execute([$room_id]);
     $deleted = $stmt->rowCount();
@@ -401,12 +401,12 @@ function remove_series($pdo, $room_id)
         if ($deleted == 1) {
             return [
                 'type' => 'success',
-                'message' => sprintf("Series '%s' was removed!", $room_info['name'])
+                'message' => sprintf("room '%s' was removed!", $room_info['name'])
             ];
         } else {
             return [
                 'type' => 'warning',
-                'message' => 'An error occurred. The series was not removed.'
+                'message' => 'An error occurred. The room was not removed.'
             ];
         }
     }
@@ -414,13 +414,13 @@ function remove_series($pdo, $room_id)
 }
 
 /**
- * Count the number of series listed on Series Overview
+ * Count the number of room listed on room Overview
  * @param PDO $pdo Database object
  * @return int
  */
-function count_series($pdo)
+function count_room($pdo)
 {
-    $stmt = $pdo->prepare('SELECT * FROM user');
+    $stmt = $pdo->prepare('SELECT * FROM room');
     $stmt->execute();
     $room = $stmt->rowCount();
     return $room;
@@ -521,7 +521,7 @@ function register_user($pdo, $form_data)
     } else {
         return [
             'type' => 'danger',
-            'message' => 'There was an error. The series was not added. Try it again.'
+            'message' => 'There was an error. The room was not added. Try it again.'
         ];
     }
 }

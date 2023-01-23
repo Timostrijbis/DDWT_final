@@ -18,8 +18,8 @@ $cred = set_cred('DDWT_final', 'DDWT_final');
 require __DIR__ . '/vendor/autoload.php';
 
 /* Section for redundant code */
-/* Get Number of Series */
-$nbr_series = count_series($db);
+/* Get Number of rooms */
+$nbr_room = count_room($db);
 $nbr_users = count_users($db);
 
 /* Call session on every load to maintain information */
@@ -76,7 +76,7 @@ else {
 $router = new \Bramus\Router\Router();
 
 /* landing page */
-$router->get('/', function () use ($template, $db, $nbr_series, $nbr_users) {
+$router->get('/', function () use ($template, $db, $nbr_room, $nbr_users) {
     if (new_route('/DDWT_final/', 'get')) {
 
         /* Page info */
@@ -96,7 +96,7 @@ $router->get('/', function () use ($template, $db, $nbr_series, $nbr_users) {
 });
 
 /* Overview page */
-$router->get('overview/', function () use ($template, $db, $nbr_series, $nbr_users) {
+$router->get('overview/', function () use ($template, $db, $nbr_room, $nbr_users) {
     /* Page info */
     $page_title = 'Overview';
     $breadcrumbs = get_breadcrumbs([
@@ -106,10 +106,9 @@ $router->get('overview/', function () use ($template, $db, $nbr_series, $nbr_use
     $navigation = get_navigation($template, 2);
 
     /* Page content */
-    $page_subtitle = 'The overview of all series';
-    $page_content = 'Here you find all series listed on Series Overview.';
-    $left_content = get_room_table(get_series($db), $db);
-
+    $page_subtitle = 'The overview of all Rooms';
+    $page_content = 'Here you find all available rooms listed on rooms Overview.';
+    $left_content = get_room_table(get_room($db), $db);
     if (isset($_GET['error_msg'])) {
         $error_msg = get_error($_GET['error_msg']);
     }
@@ -119,11 +118,11 @@ $router->get('overview/', function () use ($template, $db, $nbr_series, $nbr_use
     include use_template('main');
 });
 
-/* edit get */
-$router->get('rooms/edit/(\d+)', function ($room_id) use ($template, $db, $nbr_series, $nbr_users) {
+/* edit room info get */
+$router->get('edit/(\d+)', function ($room_id) use ($template, $db, $nbr_room, $nbr_users) {
     $login_status = check_login();
 
-    /* Get series info from db */
+    /* Get room info from db */
     $room_info = get_room_info($db, $room_id);
 
     /* Page info */
@@ -135,17 +134,17 @@ $router->get('rooms/edit/(\d+)', function ($room_id) use ($template, $db, $nbr_s
     $navigation = get_navigation($template, 3);
 
     /* Page content */
-    $page_subtitle = sprintf("Edit %s", $room_info['name']);
-    $page_content = 'Edit the series below.';
-    $submit_btn = "Edit Series";
+    $page_subtitle = sprintf("Edit %s", $room_info['address']);
+    $page_content = 'Edit the Room below.';
+    $submit_btn = "Edit Room";
     $form_action = '/DDWT22/week2/edit/';
 
     /* Choose Template */
     include use_template('edit');
 });
 
-$router->get('room/(\d+)', function ($room_id) use ($template, $db, $nbr_series, $nbr_users) {
-    /* Get series from db */
+$router->get('room/(\d+)', function ($room_id) use ($template, $db, $nbr_room, $nbr_users) {
+    /* Get room from db */
     $room_info = get_room_info($db, $room_id);
 
     /* Page info */
@@ -174,7 +173,7 @@ $router->get('room/(\d+)', function ($room_id) use ($template, $db, $nbr_series,
 
 
 /* add room get */
-$router->get('add/', function () use ($template, $db, $nbr_series, $nbr_users) {
+$router->get('add/', function () use ($template, $db, $nbr_room, $nbr_users) {
     $login_status = check_login();
     if (!$login_status) {
         redirect("/DDWT_final/login/");
@@ -305,7 +304,7 @@ $router->get('myaccount/', function () use ($template, $db) {
     }
 
     /* Page content */
-    $page_content = get_user_info($db, $_SESSION['user_id']);
+    $page_content = get_user_info($db);
     $page_subtitle = 'My account';
 
     /* Include template */
