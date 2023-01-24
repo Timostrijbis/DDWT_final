@@ -35,15 +35,23 @@
                     <table class="table">
                         <tbody>
                         <tr>
+                            <th scope="row">Postal Code</th>
+                            <td><?= $postal ?></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">City</th>
+                            <td><?= $city ?></td>
+                        </tr>
+                        <tr>
                             <th scope="row">Price</th>
                             <td><?= $page_content ?></td>
                         </tr>
                         <tr>
-                            <th scope="row">Creators</th>
+                            <th scope="row">Size (square meters)</th>
                             <td><?= $creators ?></td>
                         </tr>
                         <tr>
-                            <th scope="row">Number of seasons</th>
+                            <th scope="row">Room type</th>
                             <td><?= $nbr_seasons ?></td>
                         </tr>
                         <tr>
@@ -85,3 +93,4 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.1/js/bootstrap.min.js" integrity="sha512-UR25UO94eTnCVwjbXozyeVd6ZqpaAE9naiEUBK/A+QDbfSTQFhPGj5lOR6d8tsgbBk84Ggb5A3EkjsOgPRPcKA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     </body>
 </html>
+
