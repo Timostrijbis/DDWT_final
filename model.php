@@ -314,7 +314,7 @@ function add_room($pdo, $room_info)
  * @param array $room_info Associative array with room info
  * @return array
  */
-function update_room($pdo, $room_info)
+function update_room($pdo, $room_info, $id, $owner)
 {
     /* Check if all fields are set */
     if (
@@ -343,8 +343,8 @@ function update_room($pdo, $room_info)
 
 
     /* Check if room already exists */
-    $stmt = $pdo->prepare('SELECT * FROM room WHERE id = ?');
-    $stmt->execute([$room_info['id']]);
+    $stmt = $pdo->prepare('SELECT * FROM room WHERE address = ? AND id != ?');
+    $stmt->execute([$room_info['address'], $id]);
     $room = $stmt->rowCount();
     if ($room) {
         return [
@@ -362,14 +362,14 @@ function update_room($pdo, $room_info)
         $room_info['price'],
         $room_info['type'],
         $room_info['size'],
-        $room_info['room_id']
+        $id
     ]);
     $updated = $stmt->rowCount();
-    if ($_SESSION['user_id'] == $room_info['user']) {
+    if ($_SESSION['user_id'] == $owner) {
         if ($updated == 1) {
             return [
                 'type' => 'success',
-                'message' => sprintf("room '%s' was edited!", $room_info['Name'])
+                'message' => "room was edited!"
             ];
         } else {
             return [
@@ -400,7 +400,7 @@ function remove_room($pdo, $room_id)
         if ($deleted == 1) {
             return [
                 'type' => 'success',
-                'message' => sprintf("room '%s' was removed!", $room_info['name'])
+                'message' => sprintf("room '%s' was removed!", $room_info['owner'])
             ];
         } else {
             return [
@@ -575,9 +575,9 @@ function login_user($pdo, $form_data)
 function get_user_info($pdo) {
     $stmt = $pdo->prepare('SELECT * FROM user WHERE username = ?');
     $stmt->execute([$_SESSION['user_id']]);
-    $stmt->fetchAll();
+    $user_info = $stmt->fetchAll();
 
-    return 'USER INFO HERE...';
+    return $user_info[0];
 }
 
 function check_login()  {
@@ -696,4 +696,151 @@ function send_message($pdo, $message){
     }
 
 
+}
+function opt_in_tennant ($pdo, $user_id){
+    $stmt = $pdo->prepare('SELECT room.id, room.address, room.price, room.size FROM room JOIN opt_in ON opt_in.room_id=room.id WHERE opt_in.username = ?');
+    $stmt->execute([$user_id]);
+    $message = $stmt->fetchAll();
+    $message_exp = array();
+
+    /* Create array with htmlspecialchars */
+    foreach ($message as $key => $value) {
+        foreach ($value as $user_key => $user_input) {
+            $message_exp[$key][$user_key] = htmlspecialchars($user_input);
+        }
+    }
+    return $message_exp;
+}
+
+function make_opt_in_table ($pdo, $message) {
+    $table_exp = '
+    <table class="table table-hover">
+    <thead
+    <tr>
+        <th scope="col">Address</th>
+        <th scope="col">Price</th>
+        <th scope="col">Size</th>
+        <th scope="col"></th>
+    </tr>
+    </thead>
+    <tbody>';
+    foreach ($message as &$value) {
+        $table_exp .= '
+        <tr>
+            <td>' . $value['address'] . '</td>
+            <td>' . $value['price'] . '</td>
+            <td>' . $value['size'] . '</td>
+            <td> <form action="/DDWT_final/remove_opt_in/" method="POST">
+                <input type="hidden" value='. $value['id'] .' name="room_id">
+                <button type="submit" class="btn btn-danger">Remove Opt-in</button>
+                </form></td>
+        </tr>
+        ';
+    }
+    $table_exp .= '
+    </tbody>
+    </table>
+    ';
+    return $table_exp;
+}
+
+function opt_in_owner ($pdo, $user_id){
+    $stmt = $pdo->prepare('SELECT 
+    user.username, user.first_name, user.last_name, user.birth_date, user.occupation 
+    FROM user 
+    JOIN opt_in ON opt_in.username=user.username
+    JOIN room ON room.id = opt_in.room_id
+    WHERE room.owner = ?');
+    $stmt->execute([$user_id]);
+    $message = $stmt->fetchAll();
+    $message_exp = array();
+
+    /* Create array with htmlspecialchars */
+    foreach ($message as $key => $value) {
+        foreach ($value as $user_key => $user_input) {
+            $message_exp[$key][$user_key] = htmlspecialchars($user_input);
+        }
+    }
+    return $message_exp;
+}
+
+function make_opt_in_table_owner ($pdo, $message) {
+    $table_exp = '
+    <table class="table table-hover">
+    <thead
+    <tr>
+        <th scope="col">Username</th>
+        <th scope="col">First name</th>
+        <th scope="col">Last name</th>
+        <th scope="col">date of birth</th>
+        <th scope="col">Occupation</th>
+    </tr>
+    </thead>
+    <tbody>';
+    foreach ($message as &$value) {
+        $table_exp .= '
+        <tr>
+            <td>' . $value['username'] . '</td>
+            <td>' . $value['first_name'] . '</td>
+            <td>' . $value['last_name'] . '</td>
+            <td>' . $value['birth_date'] . '</td>
+            <td>' . $value['occupation'] . '</td>
+        </tr>
+        ';
+    }
+    $table_exp .= '
+    </tbody>
+    </table>
+    ';
+    return $table_exp;
+}
+
+function add_opt_in($pdo, $room_id) {
+
+    $username = get_user_id();
+
+    $stmt = $pdo->prepare('SELECT * FROM opt_in WHERE username = ? and room_id = ?');
+    $stmt->execute([$username, $room_id]);
+    $room = $stmt->rowCount();
+    if ($room) {
+        return [
+            'type' => 'danger',
+            'message' => 'You have already responded to this room.'
+        ];
+    }
+
+    $stmt = $pdo->prepare("INSERT INTO opt_in (username, room_id) VALUES (?, ?)");
+    $stmt->execute([$username, $room_id]);
+    $deleted = $stmt->rowCount();
+    if ($deleted == 1) {
+        return [
+            'type' => 'success',
+            'message' => 'Your response has been submitted'
+        ];
+    } else {
+        return [
+            'type' => 'warning',
+            'message' => 'An error occurred. The room was not removed.'
+        ];
+    }
+
+}
+
+function remove_opt_in($pdo, $room_id) {
+    /* Delete room */
+    $username = get_user_id();
+    $stmt = $pdo->prepare("DELETE FROM opt_in WHERE room_id = ? AND username = ?");
+    $stmt->execute([$room_id, $username]);
+    $deleted = $stmt->rowCount();
+    if ($deleted == 1) {
+        return [
+            'type' => 'success',
+            'message' => 'Your opt-in was removed'
+        ];
+    } else {
+        return [
+            'type' => 'warning',
+            'message' => 'An error occurred. The opt-in was not removed.'
+        ];
+    }
 }

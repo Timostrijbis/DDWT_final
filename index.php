@@ -36,6 +36,10 @@ if (check_login()) {
             'name' => 'Overview',
             'url' => '/DDWT_final/overview/'
         ),
+        4 => Array(
+            'name' => 'Opt-in',
+            'url' => '/DDWT_final/opt-in/'
+        ),
         3 => Array(
             'name' => 'My Account',
             'url' => '/DDWT_final/myaccount/'
@@ -161,13 +165,13 @@ $router->post('edit/(\d+)', function ($room_id) use ($template, $db, $nbr_room, 
     $page_subtitle = sprintf("Edit %s", $room_info['address']);
     $page_content = 'Edit the Room below.';
     $submit_btn = "Edit Room";
-    $feedback = update_room($db, $_POST);
+    $url = 3;
+    $feedback = update_room($db, $_POST, $room_id, $room_info['owner']);
     if (isset($_GET['error_msg'])) {
         $error_msg = get_error($_GET['error_msg']);
     }
     redirect(sprintf('/DDWT_final/overview/?error_msg=%s',
         urlencode(json_encode($feedback))));
-
 
     /* Choose Template */
     include use_template('edit');
@@ -192,10 +196,17 @@ $router->get('room/(\d+)', function ($room_id) use ($template, $db, $nbr_room, $
     $page_content = $room_info['price'];
     $nbr_seasons = $room_info['type'];
     $creators = $room_info['size'];
+    $postal = $room_info['postal_code'];
+    $city = $room_info['city'];
+    $user_info = get_user_info($db);
 
     $display_buttons = False;
     if ($_SESSION['user_id'] == $room_info['owner']) {
         $display_buttons = True;
+    }
+    $display_opt_in = False;
+    if ($user_info['role'] == 'tenant') {
+        $display_opt_in = True;
     }
     $right_column = use_template('cards');
     /* Choose Template */
@@ -250,7 +261,7 @@ $router->post('add/', function () use ($template, $db, $nbr_room, $nbr_users) {
     $submit_btn = "Submit room";
     $form_action = '/DDWT_final/add/';
 
-    $feedback = add_series($db, $_POST);
+    $feedback = add_room($db, $_POST);
     if (isset($_GET['error_msg'])) {
         $error_msg = get_error($_GET['error_msg']);
     }
@@ -259,17 +270,68 @@ $router->post('add/', function () use ($template, $db, $nbr_room, $nbr_users) {
     include use_template('new');
 });
 
-/* Remove room */
+/* Remove room post*/
 $router->post('remove/', function () use ($template, $db, $nbr_room, $nbr_users) {
     /* Remove room from database */
     $room_id = $_POST['room_id'];
     $feedback = remove_room($db, $room_id);
     if (isset($_GET['error_msg'])) {
-        redirect(sprintf('/DDWT_final/overview/?error_msg=%s',
-            urlencode(json_encode($feedback))));
-    } else{
-
+        $error_msg = get_error($_GET['error_msg']);
     }
+    redirect(sprintf('/DDWT_final/overview/?error_msg=%s',
+        urlencode(json_encode($feedback))));
+});
+
+/* opt-in get */
+$router->get('opt-in/', function () use ($template, $db) {
+    /* Page info */
+    $user_id = get_user_id();
+    $page_title = 'Your Opt-ins';
+    $breadcrumbs = get_breadcrumbs([
+        'Opt-in' => na('/DDWT_final/opt-in/', True)
+    ]);
+    $navigation = get_navigation($template, 4);
+
+    /* Page content */
+    $page_subtitle = 'Here you can see all responses on rooms';
+    $page_content = make_opt_in_table($db, opt_in_tennant($db, $user_id));
+    $page_content_extra = make_opt_in_table_owner($db, opt_in_owner($db, $user_id));
+    $test = opt_in_owner($db, $user_id);
+    /* Choose Template */
+    include use_template('opt-in');
+
+    /* Page info */
+    $page_title = 'Add Room';
+    $breadcrumbs = get_breadcrumbs([
+        'DDWT_final' => na('/DDWT_final/', False),
+        '' => na('/DDWT_final/', False),
+        'Add room' => na('/DDWT_final/new/', True)
+    ]);
+    $navigation = get_navigation($template, 5);
+});
+
+/* opt-in post*/
+$router->post('opt_in/', function () use ($template, $db, $nbr_room, $nbr_users) {
+
+    $room_id = $_POST['room_id'];
+    $feedback = add_opt_in($db, $room_id);
+    if (isset($_GET['error_msg'])) {
+        $error_msg = get_error($_GET['error_msg']);
+    }
+    redirect(sprintf('/DDWT_final/overview/?error_msg=%s',
+        urlencode(json_encode($feedback))));
+});
+
+/* Remove opt-in post*/
+$router->post('remove_opt_in/', function () use ($template, $db, $nbr_room, $nbr_users) {
+    /* Remove room from database */
+    $room_id = $_POST['room_id'];
+    $feedback = remove_opt_in($db, $room_id);
+    if (isset($_GET['error_msg'])) {
+        $error_msg = get_error($_GET['error_msg']);
+    }
+    redirect(sprintf('/DDWT_final/overview/?error_msg=%s',
+        urlencode(json_encode($feedback))));
 });
 
 /* register get */
@@ -336,27 +398,21 @@ $router->get('myaccount/', function () use ($template, $db) {
 
     /* Page content */
     $page_content = get_user_info($db);
-    $page_subtitle = 'My account';
+    $user = $page_content['username'];
+    $date_of_birth = $page_content['birth_date'];
+    $occupation =$page_content['occupation'];
+    $role = $page_content['role'];
+    $bio = $page_content['biography'];
+    $first = $page_content['first_name'];
+    $last = $page_content['last_name'];
+    $email = $page_content['email'];
+    $phone_number = $page_content['phone_number'];
+
+    $page_subtitle = 'Account information';
+
 
     /* Include template */
     include use_template('account');
-});
-
-/* ???? */
-$router->get('myaccount/', function () use ($template, $db) {
-    /* Page info */
-    $page_title = 'My Account';
-    $breadcrumbs = get_breadcrumbs([
-        'Home' => na('/DDWT_final/', False),
-        'Login' => na('/DDWT_final/login/', True)
-    ]);
-    $navigation = get_navigation($template, 6);
-
-    /* Page content */
-    $page_subtitle = 'Log into your account';
-
-    /* Include template */
-    include use_template('login');
 });
 
 /* my account post */
@@ -374,7 +430,7 @@ $router->post('myaccount/', function () use ($template, $db) {
     $user = get_user_name();
 
     /* Include template */
-    include use_template('login');
+    include use_template('account');
 });
 
 /* login get */

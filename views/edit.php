@@ -33,7 +33,7 @@
             <h1><?= $page_title ?></h1>
             <h5><?= $page_subtitle ?></h5>
 
-            <form action="/DDWT_final/edit/" method="POST">
+            <form action="/DDWT_final/edit/<?= $room_id ?>" method="POST">
                 <div class="form-group row">
                     <label for="inputName" class="col-sm-2 col-form-label">New Address</label>
                     <div class="col-sm-10">
