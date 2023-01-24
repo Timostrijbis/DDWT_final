@@ -161,13 +161,13 @@ $router->post('edit/(\d+)', function ($room_id) use ($template, $db, $nbr_room, 
     $page_subtitle = sprintf("Edit %s", $room_info['address']);
     $page_content = 'Edit the Room below.';
     $submit_btn = "Edit Room";
-    $feedback = update_room($db, $_POST);
+    $url = 3;
+    $feedback = update_room($db, $_POST, $room_id, $room_info['owner']);
     if (isset($_GET['error_msg'])) {
         $error_msg = get_error($_GET['error_msg']);
     }
     redirect(sprintf('/DDWT_final/overview/?error_msg=%s',
         urlencode(json_encode($feedback))));
-
 
     /* Choose Template */
     include use_template('edit');
@@ -192,6 +192,8 @@ $router->get('room/(\d+)', function ($room_id) use ($template, $db, $nbr_room, $
     $page_content = $room_info['price'];
     $nbr_seasons = $room_info['type'];
     $creators = $room_info['size'];
+    $postal = $room_info['postal_code'];
+    $city = $room_info['city'];
 
     $display_buttons = False;
     if ($_SESSION['user_id'] == $room_info['owner']) {
@@ -250,7 +252,7 @@ $router->post('add/', function () use ($template, $db, $nbr_room, $nbr_users) {
     $submit_btn = "Submit room";
     $form_action = '/DDWT_final/add/';
 
-    $feedback = add_series($db, $_POST);
+    $feedback = add_room($db, $_POST);
     if (isset($_GET['error_msg'])) {
         $error_msg = get_error($_GET['error_msg']);
     }
@@ -259,17 +261,16 @@ $router->post('add/', function () use ($template, $db, $nbr_room, $nbr_users) {
     include use_template('new');
 });
 
-/* Remove room */
+/* Remove room post*/
 $router->post('remove/', function () use ($template, $db, $nbr_room, $nbr_users) {
     /* Remove room from database */
     $room_id = $_POST['room_id'];
     $feedback = remove_room($db, $room_id);
     if (isset($_GET['error_msg'])) {
-        redirect(sprintf('/DDWT_final/overview/?error_msg=%s',
-            urlencode(json_encode($feedback))));
-    } else{
-
+        $error_msg = get_error($_GET['error_msg']);
     }
+    redirect(sprintf('/DDWT_final/overview/?error_msg=%s',
+        urlencode(json_encode($feedback))));
 });
 
 /* register get */
@@ -340,23 +341,6 @@ $router->get('myaccount/', function () use ($template, $db) {
 
     /* Include template */
     include use_template('account');
-});
-
-/* ???? */
-$router->get('myaccount/', function () use ($template, $db) {
-    /* Page info */
-    $page_title = 'My Account';
-    $breadcrumbs = get_breadcrumbs([
-        'Home' => na('/DDWT_final/', False),
-        'Login' => na('/DDWT_final/login/', True)
-    ]);
-    $navigation = get_navigation($template, 6);
-
-    /* Page content */
-    $page_subtitle = 'Log into your account';
-
-    /* Include template */
-    include use_template('login');
 });
 
 /* my account post */

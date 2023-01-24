@@ -314,7 +314,7 @@ function add_room($pdo, $room_info)
  * @param array $room_info Associative array with room info
  * @return array
  */
-function update_room($pdo, $room_info)
+function update_room($pdo, $room_info, $id, $owner)
 {
     /* Check if all fields are set */
     if (
@@ -343,8 +343,8 @@ function update_room($pdo, $room_info)
 
 
     /* Check if room already exists */
-    $stmt = $pdo->prepare('SELECT * FROM room WHERE id = ?');
-    $stmt->execute([$room_info['id']]);
+    $stmt = $pdo->prepare('SELECT * FROM room WHERE address = ? AND id != ?');
+    $stmt->execute([$room_info['address'], $id]);
     $room = $stmt->rowCount();
     if ($room) {
         return [
@@ -362,14 +362,14 @@ function update_room($pdo, $room_info)
         $room_info['price'],
         $room_info['type'],
         $room_info['size'],
-        $room_info['room_id']
+        $id
     ]);
     $updated = $stmt->rowCount();
-    if ($_SESSION['user_id'] == $room_info['user']) {
+    if ($_SESSION['user_id'] == $owner) {
         if ($updated == 1) {
             return [
                 'type' => 'success',
-                'message' => sprintf("room '%s' was edited!", $room_info['Name'])
+                'message' => "room was edited!"
             ];
         } else {
             return [
@@ -389,6 +389,7 @@ function update_room($pdo, $room_info)
  */
 function remove_room($pdo, $room_id)
 {
+    p_print($room_id);
     /* Get room info */
     $room_info = get_room_info($pdo, $room_id);
 
@@ -400,7 +401,7 @@ function remove_room($pdo, $room_id)
         if ($deleted == 1) {
             return [
                 'type' => 'success',
-                'message' => sprintf("room '%s' was removed!", $room_info['name'])
+                'message' => sprintf("room '%s' was removed!", $room_info['owner'])
             ];
         } else {
             return [
@@ -575,7 +576,35 @@ function login_user($pdo, $form_data)
 function get_user_info($pdo) {
     $stmt = $pdo->prepare('SELECT * FROM user WHERE username = ?');
     $stmt->execute([$_SESSION['user_id']]);
-    $stmt->fetchAll();
+    $user_info = $stmt->fetchAll();
+    p_print($user_info['username']);
+
+
+
+    $table_exp = '
+    <table class="table table-hover">
+
+    <tbody>';
+    foreach ($user_info as $key => $value) {
+        $table_exp .= '
+        <tr>
+            <th scope="col">Username:</th>
+            <td scope="row">' . $user_info['username'] . '</td>
+        </tr>
+        <tr>            
+            <th scope="col">Date of birth:</th>
+            <td scope="row">' . $user_info['birth_date'] . '</td>
+        </tr>
+        <tr>
+            <th scope="col">Date</th>
+        </tr>
+        
+        ';
+    }
+    $table_exp .= '
+    </tbody>
+    </table>
+    ';
 
     return 'USER INFO HERE...';
 }
