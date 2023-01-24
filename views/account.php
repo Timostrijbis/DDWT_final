@@ -31,7 +31,48 @@
 
                     <h1><?= $page_title ?></h1>
                     <h5><?= $page_subtitle ?></h5>
-                    <p><?= $page_content ?></p>
+<!--                    <p>--><?//= $page_content ?><!--</p>-->
+                    <table class="table table-hover">
+                        <tbody>
+                        <tr>
+                            <th scope="row">Username:</th>
+                            <td> <?= $user ?></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Date of birth:</th>
+                            <td> <?= $date_of_birth ?></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Email-address:</th>
+                            <td> <?= $email ?></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Phone number:</th>
+                            <td> <?= $phone_number ?></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Occupation:</th>
+                            <td> <?= $occupation ?></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">role:</th>
+                            <td> <?= $role ?></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">First name:</th>
+                            <td> <?= $first ?></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Last name:</th>
+                            <td> <?= $last ?></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">biography:</th>
+                            <td> <?= $bio ?></td>
+                        </tr>
+                        </tbody>
+                    </table>
+
                 </div>
 
             </div>

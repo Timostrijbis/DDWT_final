@@ -36,6 +36,10 @@ if (check_login()) {
             'name' => 'Overview',
             'url' => '/DDWT_final/overview/'
         ),
+        4 => Array(
+            'name' => 'opt-in',
+            'url' => '/DDWT_final/opt-in/'
+        ),
         3 => Array(
             'name' => 'My Account',
             'url' => '/DDWT_final/myaccount/'
@@ -273,6 +277,34 @@ $router->post('remove/', function () use ($template, $db, $nbr_room, $nbr_users)
         urlencode(json_encode($feedback))));
 });
 
+/* opt-in get */
+$router->get('opt-in/', function () use ($template, $db) {
+    /* Page info */
+    $user_id = get_user_id();
+    $page_title = 'Your Opt-ins';
+    $breadcrumbs = get_breadcrumbs([
+        'Opt-in' => na('/DDWT_final/opt-in/', True)
+    ]);
+    $navigation = get_navigation($template, 4);
+
+    /* Page content */
+    $page_subtitle = 'Here you can see all responses on rooms';
+    $page_content = make_opt_in_table($db, opt_in_tennant($db, $user_id));
+    $page_content_extra = make_opt_in_table_owner($db, opt_in_owner($db, $user_id));
+    $test = opt_in_owner($db, $user_id);
+    /* Choose Template */
+    include use_template('opt-in');
+
+    /* Page info */
+    $page_title = 'Add Room';
+    $breadcrumbs = get_breadcrumbs([
+        'DDWT_final' => na('/DDWT_final/', False),
+        '' => na('/DDWT_final/', False),
+        'Add room' => na('/DDWT_final/new/', True)
+    ]);
+    $navigation = get_navigation($template, 5);
+});
+
 /* register get */
 $router->get('register/', function () use ($template, $db) {
     /* Page info */
@@ -337,7 +369,18 @@ $router->get('myaccount/', function () use ($template, $db) {
 
     /* Page content */
     $page_content = get_user_info($db);
-    $page_subtitle = 'My account';
+    $user = $page_content['username'];
+    $date_of_birth = $page_content['birth_date'];
+    $occupation =$page_content['occupation'];
+    $role = $page_content['role'];
+    $bio = $page_content['biography'];
+    $first = $page_content['first_name'];
+    $last = $page_content['last_name'];
+    $email = $page_content['email'];
+    $phone_number = $page_content['phone_number'];
+
+    $page_subtitle = 'Account information';
+
 
     /* Include template */
     include use_template('account');
@@ -358,7 +401,7 @@ $router->post('myaccount/', function () use ($template, $db) {
     $user = get_user_name();
 
     /* Include template */
-    include use_template('login');
+    include use_template('account');
 });
 
 /* login get */

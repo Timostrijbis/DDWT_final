@@ -577,36 +577,8 @@ function get_user_info($pdo) {
     $stmt = $pdo->prepare('SELECT * FROM user WHERE username = ?');
     $stmt->execute([$_SESSION['user_id']]);
     $user_info = $stmt->fetchAll();
-    p_print($user_info['username']);
 
-
-
-    $table_exp = '
-    <table class="table table-hover">
-
-    <tbody>';
-    foreach ($user_info as $key => $value) {
-        $table_exp .= '
-        <tr>
-            <th scope="col">Username:</th>
-            <td scope="row">' . $user_info['username'] . '</td>
-        </tr>
-        <tr>            
-            <th scope="col">Date of birth:</th>
-            <td scope="row">' . $user_info['birth_date'] . '</td>
-        </tr>
-        <tr>
-            <th scope="col">Date</th>
-        </tr>
-        
-        ';
-    }
-    $table_exp .= '
-    </tbody>
-    </table>
-    ';
-
-    return 'USER INFO HERE...';
+    return $user_info[0];
 }
 
 function check_login()  {
@@ -726,3 +698,97 @@ function send_message($pdo, $message){
 
 
 }
+function opt_in_tennant ($pdo, $user_id){
+    $stmt = $pdo->prepare('SELECT room.address, room.price, room.size FROM room JOIN opt_in ON opt_in.room_id=room.id WHERE opt_in.username = ?');
+    $stmt->execute([$user_id]);
+    $message = $stmt->fetchAll();
+    $message_exp = array();
+
+    /* Create array with htmlspecialchars */
+    foreach ($message as $key => $value) {
+        foreach ($value as $user_key => $user_input) {
+            $message_exp[$key][$user_key] = htmlspecialchars($user_input);
+        }
+    }
+    return $message_exp;
+}
+
+function make_opt_in_table ($pdo, $message) {
+    $table_exp = '
+    <table class="table table-hover">
+    <thead
+    <tr>
+        <th scope="col">Address</th>
+        <th scope="col">Price</th>
+        <th scope="col">Size</th>
+        <th scope="col"></th>
+    </tr>
+    </thead>
+    <tbody>';
+    foreach ($message as &$value) {
+        $table_exp .= '
+        <tr>
+            <td>' . $value['address'] . '</td>
+            <td>' . $value['price'] . '</td>
+            <td>' . $value['size'] . '</td>
+        </tr>
+        ';
+    }
+    $table_exp .= '
+    </tbody>
+    </table>
+    ';
+    return $table_exp;
+}
+
+function opt_in_owner ($pdo, $user_id){
+    $stmt = $pdo->prepare('SELECT 
+    user.username, user.first_name, user.last_name, user.birth_date, user.occupation 
+    FROM user 
+    JOIN opt_in ON opt_in.username=user.username
+    JOIN room ON room.id = opt_in.room_id
+    WHERE room.owner = ?');
+    $stmt->execute([$user_id]);
+    $message = $stmt->fetchAll();
+    $message_exp = array();
+
+    /* Create array with htmlspecialchars */
+    foreach ($message as $key => $value) {
+        foreach ($value as $user_key => $user_input) {
+            $message_exp[$key][$user_key] = htmlspecialchars($user_input);
+        }
+    }
+    return $message_exp;
+}
+
+function make_opt_in_table_owner ($pdo, $message) {
+    $table_exp = '
+    <table class="table table-hover">
+    <thead
+    <tr>
+        <th scope="col">Username</th>
+        <th scope="col">First name</th>
+        <th scope="col">Last name</th>
+        <th scope="col">date of birth</th>
+        <th scope="col">Occupation</th>
+    </tr>
+    </thead>
+    <tbody>';
+    foreach ($message as &$value) {
+        $table_exp .= '
+        <tr>
+            <td>' . $value['username'] . '</td>
+            <td>' . $value['first_name'] . '</td>
+            <td>' . $value['last_name'] . '</td>
+            <td>' . $value['birth_date'] . '</td>
+            <td>' . $value['occupation'] . '</td>
+        </tr>
+        ';
+    }
+    $table_exp .= '
+    </tbody>
+    </table>
+    ';
+    return $table_exp;
+}
+
