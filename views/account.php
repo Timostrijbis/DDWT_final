@@ -87,24 +87,11 @@
                             Welcome, <?= $_SESSION['user_id'] ?>
                         </div>
                         <div class="card-body">
-                            <p>You're logged in to Series Overview.</p>
+                            <p>You're logged in to Room Overview.</p>
                             <a href="/DDWT_final/logout/" class="btn btn-primary">Logout</a>
                         </div>
                     </div>
                 </div>
-
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-header">
-                            Add series
-                        </div>
-                        <div class="card-body">
-                            <p>Add your contribution to Series Overview.</p>
-                            <a href="/DDWT_final/add/" class="btn btn-primary">Add a series</a>
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </div>
 
