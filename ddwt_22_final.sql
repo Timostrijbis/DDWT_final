@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jan 12, 2023 at 02:32 PM
+-- Generation Time: Jan 23, 2023 at 05:30 PM
 -- Server version: 5.7.24
 -- PHP Version: 8.0.1
 
@@ -68,10 +68,10 @@ CREATE TABLE `opt_in` (
 CREATE TABLE `room` (
   `id` int(11) NOT NULL,
   `owner` varchar(25) NOT NULL,
+  `address` varchar(255) NOT NULL,
+  `postal_code` varchar(255) NOT NULL,
+  `city` varchar(255) NOT NULL,
   `price` int(11) NOT NULL,
-  `city` int(11) NOT NULL,
-  `address` int(11) NOT NULL,
-  `postal_code` int(11) NOT NULL,
   `type` varchar(255) NOT NULL,
   `size` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

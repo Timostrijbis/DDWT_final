@@ -91,8 +91,8 @@ $router->get('/', function () use ($template, $db, $nbr_room, $nbr_users) {
         $navigation = get_navigation($template, 1);
 
         /* Page content */
-        $page_subtitle = 'Welkom bij onze website';
-        $page_content = 'Zoek hier naar een nieuwe kamer in groningen, of geef je kamer beschikbaar voor een nieuwe huurder.';
+        $page_subtitle = 'Welcome to our site';
+        $page_content = 'Here, you can find rooms available in Gronigen, or post your rooms for others to find.';
         $right_column = use_template('cards');
         /* Choose Template */
         include use_template('main');
@@ -351,8 +351,8 @@ $router->get('register/', function () use ($template, $db) {
     $navigation = get_navigation($template, 5);
 
     /* Page content */
-    $page_subtitle = 'Registreer account';
-    $page_content = 'Maak hier een nieuwe accoount aan.';
+    $page_subtitle = 'Register account';
+    $page_content = 'Register your account here.';
     /* Choose Template */
     include use_template('register');
 
@@ -491,7 +491,7 @@ $router->post('login/', function () use ($template, $db) {
 /* messages get */
 $router->get('messages/', function () use ($template, $db) {
     /* Page info */
-    $page_title = 'Berichten';
+    $page_title = 'Messages';
     $breadcrumbs = get_breadcrumbs([
         'DDWT_final' => na('/DDWT_final/', False),
         'Login' => na('/DDWT_final/login', True)
@@ -502,7 +502,7 @@ $router->get('messages/', function () use ($template, $db) {
     if (isset($_GET['error_msg'])) {
         $error_msg = get_error($_GET['error_msg']);
     }
-    $page_subtitle = 'Mijn berichten';
+    $page_subtitle = 'My Messages';
     $page_content = get_message_table(get_messages(get_user_id(), $db), $db);
 
     /* Choose Template */
