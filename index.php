@@ -91,6 +91,7 @@ $router->get('/', function () use ($template, $db, $nbr_room, $nbr_users) {
         $navigation = get_navigation($template, 1);
 
         /* Page content */
+        $owner_priveledge = FALSE;
         $page_subtitle = 'Welcome to our site';
         $page_content = 'Here, you can find rooms available in Gronigen, or post your rooms for others to find.';
         $right_column = use_template('cards');

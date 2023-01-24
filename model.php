@@ -4,8 +4,7 @@
  * Model
  *
  * Database-driven Webtechnology
- * Taught by Stijn Eikelboom
- * Based on code by Reinard van Dalen
+ * Written by group 3
  */
 
 /* Enable error reporting */
@@ -264,7 +263,7 @@ function add_room($pdo, $room_info)
 
     /* Check data type */
     if (!is_numeric($room_info['size']) or
-    !is_numeric($room_info['size']))
+        !is_numeric($room_info['size']))
     {
         return [
             'type' => 'danger',
@@ -456,6 +455,12 @@ function get_user_id()
     }
 }
 
+/**
+ * Get the full name of the user that is logged in
+ * @param $user_id The username
+ * @param $pdo
+ * @return string First and last name
+ */
 function get_user_name($user_id, $pdo)
 {
     $stmt = $pdo->prepare('SELECT first_name, last_name FROM user WHERE username = ?');
@@ -465,7 +470,12 @@ function get_user_name($user_id, $pdo)
     return $full_name;
 }
 
-/* register a new user */
+/**
+ * Get data from posted form to add new user to the database
+ * @param $pdo
+ * @param $form_data
+ * @return array|string[]
+ */
 function register_user($pdo, $form_data)
 {
     /* Check if all fields are set */
@@ -525,6 +535,12 @@ function register_user($pdo, $form_data)
     }
 }
 
+/**
+ * This function is used to check if the user is already in the database, and start the session
+ * @param $pdo
+ * @param $form_data
+ * @return array|string[]
+ */
 function login_user($pdo, $form_data)
 {
     /* Check if all fields are set */
@@ -572,6 +588,11 @@ function login_user($pdo, $form_data)
     }
 }
 
+/**
+ * Retrieve all info from logged in user
+ * @param $pdo
+ * @return mixed Returns a dictionary
+ */
 function get_user_info($pdo) {
     $stmt = $pdo->prepare('SELECT * FROM user WHERE username = ?');
     $stmt->execute([$_SESSION['user_id']]);
@@ -580,6 +601,10 @@ function get_user_info($pdo) {
     return $user_info[0];
 }
 
+/**
+ * Check if the user is logged in
+ * @return bool
+ */
 function check_login()  {
     if (isset($_SESSION['user_id'])) {
         return True;
@@ -588,6 +613,10 @@ function check_login()  {
     }
 }
 
+/**
+ * Used to end the session and log out
+ * @return string[]
+ */
 function logout_user()
 {
     session_start();
@@ -598,6 +627,11 @@ function logout_user()
     ];
 }
 
+/**
+ * @param $username
+ * @param $password
+ * @return array
+ */
 function set_cred($username, $password){
     return [
         'username'=> $username,
@@ -605,6 +639,12 @@ function set_cred($username, $password){
     ];
 }
 
+/**
+ * Get all messages sent to the user
+ * @param $username
+ * @param $pdo
+ * @return Dictionary of messages
+ */
 function get_messages($username, $pdo){
     $stmt = $pdo->prepare('SELECT * FROM message WHERE receiver_username = ?');
     $stmt->execute([$username]);
@@ -620,7 +660,12 @@ function get_messages($username, $pdo){
     return $message;
 }
 
-
+/**
+ * Make a bootstrap table of all the messages
+ * @param $message
+ * @param $pdo
+ * @return string
+ */
 function get_message_table($message, $pdo)
 {
     $table_exp = '
@@ -651,6 +696,12 @@ function get_message_table($message, $pdo)
     return $table_exp;
 }
 
+/**
+ * Use the filled out form data to add a message to the database
+ * @param $pdo
+ * @param $message
+ * @return array|string[]
+ */
 function send_message($pdo, $message){
     /* Check if all fields are set */
     if (
@@ -697,8 +748,15 @@ function send_message($pdo, $message){
 
 
 }
+
+/**
+ * Get all opt-ins that a tenant has sent for other peoples rooms
+ * @param $pdo
+ * @param $user_id
+ * @return array
+ */
 function opt_in_tennant ($pdo, $user_id){
-    $stmt = $pdo->prepare('SELECT room.id, room.address, room.price, room.size FROM room JOIN opt_in ON opt_in.room_id=room.id WHERE opt_in.username = ?');
+    $stmt = $pdo->prepare('SELECT room.owner, room.id, room.address, room.price, room.size FROM room JOIN opt_in ON opt_in.room_id=room.id WHERE opt_in.username = ?');
     $stmt->execute([$user_id]);
     $message = $stmt->fetchAll();
     $message_exp = array();
@@ -712,6 +770,12 @@ function opt_in_tennant ($pdo, $user_id){
     return $message_exp;
 }
 
+/**
+ * Make a table with all the opt-ins from the previous function
+ * @param $pdo
+ * @param $message
+ * @return string
+ */
 function make_opt_in_table ($pdo, $message) {
     $table_exp = '
     <table class="table table-hover">
@@ -720,6 +784,7 @@ function make_opt_in_table ($pdo, $message) {
         <th scope="col">Address</th>
         <th scope="col">Price</th>
         <th scope="col">Size</th>
+        <th scope="col">Owner</th>
         <th scope="col"></th>
     </tr>
     </thead>
@@ -730,6 +795,7 @@ function make_opt_in_table ($pdo, $message) {
             <td>' . $value['address'] . '</td>
             <td>' . $value['price'] . '</td>
             <td>' . $value['size'] . '</td>
+            <td>' . $value['owner'] . '</td>
             <td> <form action="/DDWT_final/remove_opt_in/" method="POST">
                 <input type="hidden" value='. $value['id'] .' name="room_id">
                 <button type="submit" class="btn btn-danger">Remove Opt-in</button>
@@ -744,6 +810,12 @@ function make_opt_in_table ($pdo, $message) {
     return $table_exp;
 }
 
+/**
+ * Get all opt-ins that an owner has received for his rooms
+ * @param $pdo
+ * @param $user_id
+ * @return array
+ */
 function opt_in_owner ($pdo, $user_id){
     $stmt = $pdo->prepare('SELECT 
     user.username, user.first_name, user.last_name, user.birth_date, user.occupation 
@@ -764,6 +836,12 @@ function opt_in_owner ($pdo, $user_id){
     return $message_exp;
 }
 
+/**
+ * Make a table with all the opt-ins from the previous function
+ * @param $pdo
+ * @param $message
+ * @return string
+ */
 function make_opt_in_table_owner ($pdo, $message) {
     $table_exp = '
     <table class="table table-hover">
@@ -795,6 +873,12 @@ function make_opt_in_table_owner ($pdo, $message) {
     return $table_exp;
 }
 
+/**
+ * Add an opt-in with the click of a button
+ * @param $pdo
+ * @param $room_id
+ * @return string[]
+ */
 function add_opt_in($pdo, $room_id) {
 
     $username = get_user_id();
@@ -826,6 +910,12 @@ function add_opt_in($pdo, $room_id) {
 
 }
 
+/**
+ * Remove an opt-in with the click of a button
+ * @param $pdo
+ * @param $room_id
+ * @return string[]
+ */
 function remove_opt_in($pdo, $room_id) {
     /* Delete room */
     $username = get_user_id();
@@ -845,6 +935,12 @@ function remove_opt_in($pdo, $room_id) {
     }
 }
 
+/**
+ * Extra table added on the overview page for owners for their rooms
+ * @param $room
+ * @param $pdo
+ * @return string
+ */
 function get_owner_table($room, $pdo)
 {
     $table_exp = '
@@ -875,6 +971,12 @@ function get_owner_table($room, $pdo)
     return $table_exp;
 }
 
+/**
+ * Get all rooms from the user from the database
+ * @param $pdo
+ * @param $username
+ * @return array
+ */
 function get_owner_room($pdo, $username)
 {
     $stmt = $pdo->prepare('SELECT * FROM room WHERE owner = ?');
