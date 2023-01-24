@@ -73,6 +73,23 @@
                         </div>
                     </div>
                     <?php } ?>
+                    <?php if ($display_opt_in) { ?>
+                        <div class="row">
+                            <div class="col-sm-2">
+                                <form action="/DDWT_final/opt_in/" method="POST">
+                                    <input type="hidden" value="<?= $room_id ?>" name="room_id">
+                                    <button type="submit" class="btn btn-success">Opt-in</button>
+                                </form>
+                            </div>
+                            <div class="col-sm-2">
+                                <form action="/DDWT_final/remove_opt_in/" method="POST">
+                                    <input type="hidden" value="<?= $room_id ?>" name="room_id">
+                                    <button type="submit" class="btn btn-danger">Remove Opt-in</button>
+                                </form>
+                            </div>
+                        </div>
+
+                    <?php } ?>
                 </div>
 
                 <!-- Right column -->

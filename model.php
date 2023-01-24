@@ -389,7 +389,6 @@ function update_room($pdo, $room_info, $id, $owner)
  */
 function remove_room($pdo, $room_id)
 {
-    p_print($room_id);
     /* Get room info */
     $room_info = get_room_info($pdo, $room_id);
 
@@ -699,7 +698,7 @@ function send_message($pdo, $message){
 
 }
 function opt_in_tennant ($pdo, $user_id){
-    $stmt = $pdo->prepare('SELECT room.address, room.price, room.size FROM room JOIN opt_in ON opt_in.room_id=room.id WHERE opt_in.username = ?');
+    $stmt = $pdo->prepare('SELECT room.id, room.address, room.price, room.size FROM room JOIN opt_in ON opt_in.room_id=room.id WHERE opt_in.username = ?');
     $stmt->execute([$user_id]);
     $message = $stmt->fetchAll();
     $message_exp = array();
@@ -731,6 +730,10 @@ function make_opt_in_table ($pdo, $message) {
             <td>' . $value['address'] . '</td>
             <td>' . $value['price'] . '</td>
             <td>' . $value['size'] . '</td>
+            <td> <form action="/DDWT_final/remove_opt_in/" method="POST">
+                <input type="hidden" value='. $value['id'] .' name="room_id">
+                <button type="submit" class="btn btn-danger">Remove Opt-in</button>
+                </form></td>
         </tr>
         ';
     }
@@ -792,3 +795,52 @@ function make_opt_in_table_owner ($pdo, $message) {
     return $table_exp;
 }
 
+function add_opt_in($pdo, $room_id) {
+
+    $username = get_user_id();
+
+    $stmt = $pdo->prepare('SELECT * FROM opt_in WHERE username = ? and room_id = ?');
+    $stmt->execute([$username, $room_id]);
+    $room = $stmt->rowCount();
+    if ($room) {
+        return [
+            'type' => 'danger',
+            'message' => 'You have already responded to this room.'
+        ];
+    }
+
+    $stmt = $pdo->prepare("INSERT INTO opt_in (username, room_id) VALUES (?, ?)");
+    $stmt->execute([$username, $room_id]);
+    $deleted = $stmt->rowCount();
+    if ($deleted == 1) {
+        return [
+            'type' => 'success',
+            'message' => 'Your response has been submitted'
+        ];
+    } else {
+        return [
+            'type' => 'warning',
+            'message' => 'An error occurred. The room was not removed.'
+        ];
+    }
+
+}
+
+function remove_opt_in($pdo, $room_id) {
+    /* Delete room */
+    $username = get_user_id();
+    $stmt = $pdo->prepare("DELETE FROM opt_in WHERE room_id = ? AND username = ?");
+    $stmt->execute([$room_id, $username]);
+    $deleted = $stmt->rowCount();
+    if ($deleted == 1) {
+        return [
+            'type' => 'success',
+            'message' => 'Your opt-in was removed'
+        ];
+    } else {
+        return [
+            'type' => 'warning',
+            'message' => 'An error occurred. The opt-in was not removed.'
+        ];
+    }
+}
