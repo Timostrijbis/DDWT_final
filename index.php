@@ -110,9 +110,16 @@ $router->get('overview/', function () use ($template, $db, $nbr_room, $nbr_users
     $navigation = get_navigation($template, 2);
 
     /* Page content */
+    $user_info = get_user_info($db);
     $page_subtitle = 'The overview of all Rooms';
     $page_content = 'Here you find all available rooms listed on rooms Overview.';
     $left_content = get_room_table(get_room($db), $db);
+    $owner_priveledge = FALSE;
+    if ($user_info['role'] == 'owner') {
+        $owner_priveledge = True;
+    }
+    $page_content_owners = get_owner_table(get_owner_room($db, get_user_id()), $db);
+
     if (isset($_GET['error_msg'])) {
         $error_msg = get_error($_GET['error_msg']);
     }

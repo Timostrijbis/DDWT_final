@@ -844,3 +844,49 @@ function remove_opt_in($pdo, $room_id) {
         ];
     }
 }
+
+function get_owner_table($room, $pdo)
+{
+    $table_exp = '
+    <table class="table table-hover">
+    <thead
+    <tr>
+        <th scope="col">Address</th>
+        <th scope="col">Price</th>
+        <th scope="col">size</th>
+        <th scope="col"></th>
+    </tr>
+    </thead>
+    <tbody>';
+    foreach ($room as $key => $value) {
+        $table_exp .= '
+        <tr>
+            <th scope="row">' . $value['address'] . '</th>
+            <th scope="row">' . $value['price'] . '</th>
+            <th scope="row">' . $value['size'] . '</th>
+            <td><a href="/DDWT_final/room/' . $value['id'] . '" role="button" class="btn btn-primary">More info</a></td>
+        </tr>
+        ';
+    }
+    $table_exp .= '
+    </tbody>
+    </table>
+    ';
+    return $table_exp;
+}
+
+function get_owner_room($pdo, $username)
+{
+    $stmt = $pdo->prepare('SELECT * FROM room WHERE owner = ?');
+    $stmt->execute([$username]);
+    $room = $stmt->fetchAll();
+    $room_exp = array();
+
+    /* Create array with htmlspecialchars */
+    foreach ($room as $key => $value) {
+        foreach ($value as $user_key => $user_input) {
+            $room_exp[$key][$user_key] = htmlspecialchars($user_input);
+        }
+    }
+    return $room_exp;
+}
